@@ -79,4 +79,3 @@ Open http://localhost:3001/api with your favorite browser to swagger.
 
 ---
 
-Made with ♥ by [ThanhDev](https://www.facebook.com/thanh.vophuoc.50)
