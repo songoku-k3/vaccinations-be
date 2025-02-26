@@ -1,0 +1,194 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                        String              @id @default(uuid())
+  email                     String              @unique
+  password                  String
+  phone                     String?
+  address                   String?
+  avatar                    String?
+  name                      String
+  date_of_birth             String?
+  country                   String?
+  createAt                  DateTime            @default(now())
+  updateAt                  DateTime?           @updatedAt
+  confirmPassword           String?
+  roleId                    String?
+  verificationCode          String?
+  verificationCodeExpiresAt DateTime?
+  isVerified                Boolean             @default(false)
+  role                      Role?               @relation(fields: [roleId], references: [id])
+  Vaccination               UserOnVaccination[]
+  Booking                   Booking[]
+  Payment                   Payment[]
+  Blog                      Blog[]
+  Notification              Notification[]
+
+  @@map("users")
+}
+
+model Role {
+  id    String @id @default(uuid())
+  name  String @unique
+  users User[]
+
+  @@map("roles")
+}
+
+model Tag {
+  id    String      @id @default(uuid())
+  name  String      @unique
+  blogs BlogOnTag[]
+
+  @@map("tags")
+}
+
+model Blog {
+  id        String      @id @default(uuid())
+  title     String
+  content   String
+  createdAt DateTime    @default(now())
+  updatedAt DateTime?   @updatedAt
+  userId    String?
+  user      User?       @relation(fields: [userId], references: [id])
+  tags      BlogOnTag[]
+
+  @@map("blogs")
+}
+
+enum TagType {
+  SUC_KHOE
+  KHOA_HOC
+  Y_TE
+  CONG_NGHE
+  GIAO_DUC
+}
+
+model Vaccination {
+  id                String              @id @default(uuid())
+  userId            String?
+  vaccineName       String
+  image             String?
+  doseNumber        Int
+  vaccinationDate   DateTime
+  location          String?
+  batchNumber       String?
+  provider          String?
+  certificate       String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime?           @updatedAt
+  remainingQuantity Int?
+  manufacturer      String?
+  expirationDate    DateTime?
+  user              UserOnVaccination[]
+  Booking           Booking[]
+
+  @@map("vaccinations")
+}
+
+model Notification {
+  id      String           @id @default(uuid())
+  userId  String
+  message String
+  type    NotificationType
+  sentAt  DateTime         @default(now())
+  isRead  Boolean          @default(false)
+  user    User             @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
+}
+
+enum NotificationType {
+  REMINDER
+  CONFIRMATION
+  PAYMENT
+  UPDATE
+}
+
+model Booking {
+  id                  String        @id @default(uuid())
+  vaccinationId       String?
+  userId              String
+  Vaccination         Vaccination?  @relation(fields: [vaccinationId], references: [id])
+  user                User          @relation(fields: [userId], references: [id])
+  vaccinationQuantity Int?
+  vaccinationPrice    Float?
+  totalAmount         Float?
+  createdAt           DateTime      @default(now())
+  status              BookingStatus @default(PENDING)
+  confirmationTime    DateTime?
+  appointmentDate     DateTime?
+  Payment             Payment[]
+
+  @@map("bookings")
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELED
+  SUCCESS
+  WAITING_PAYMENT
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  bookingId     String?
+  userId        String
+  amount        Float
+  paymentMethod PaymentMethod
+  status        PaymentStatus
+  orderId       String?       @unique
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime?     @updatedAt
+
+  booking Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  user    User     @relation(fields: [userId], references: [id])
+
+  @@map("payments")
+}
+
+enum PaymentMethod {
+  CASH
+  CREDIT_CARD
+  DEBIT_CARD
+  PAYPAL
+  BANK_TRANSFER
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+model UserOnVaccination {
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  vaccinationId String
+  vaccination   Vaccination @relation(fields: [vaccinationId], references: [id])
+
+  @@id([userId, vaccinationId])
+  @@map("users_on_vaccinations")
+}
+
+model BlogOnTag {
+  blogId String
+  tagId  String
+  blog   Blog   @relation(fields: [blogId], references: [id])
+  tag    Tag    @relation(fields: [tagId], references: [id])
+
+  @@id([blogId, tagId])
+  @@map("blogs_on_tags")
+}
