@@ -14,7 +14,9 @@ async function bootstrap() {
     .setDescription('The Vaccination API description')
     .setVersion('1.0')
     .addTag('auth')
+    .addTag('blog')
     .addTag('user')
+    .addTag('tag')
     .addTag('role')
     .addBearerAuth()
     .build();

@@ -116,7 +116,7 @@ export class UserService {
     roleId: string,
     currentUserId: string,
   ): Promise<User> {
-    if (userId === currentUserId) {
+    if (isEqual(userId, currentUserId)) {
       throw new ForbiddenException('You cannot update your own role.');
     }
 

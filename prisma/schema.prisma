@@ -47,22 +47,23 @@ model Role {
 }
 
 model Tag {
-  id    String      @id @default(uuid())
-  name  String      @unique
-  blogs BlogOnTag[]
+  id    String @id @default(uuid())
+  name  String @unique
+  blogs Blog[]
 
   @@map("tags")
 }
 
 model Blog {
-  id        String      @id @default(uuid())
+  id        String    @id @default(uuid())
   title     String
   content   String
-  createdAt DateTime    @default(now())
-  updatedAt DateTime?   @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
   userId    String?
-  user      User?       @relation(fields: [userId], references: [id])
-  tags      BlogOnTag[]
+  tagId     String
+  user      User?     @relation(fields: [userId], references: [id])
+  tag       Tag       @relation(fields: [tagId], references: [id])
 
   @@map("blogs")
 }
@@ -181,14 +182,4 @@ model UserOnVaccination {
 
   @@id([userId, vaccinationId])
   @@map("users_on_vaccinations")
-}
-
-model BlogOnTag {
-  blogId String
-  tagId  String
-  blog   Blog   @relation(fields: [blogId], references: [id])
-  tag    Tag    @relation(fields: [tagId], references: [id])
-
-  @@id([blogId, tagId])
-  @@map("blogs_on_tags")
 }

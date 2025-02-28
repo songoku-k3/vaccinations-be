@@ -8,6 +8,8 @@ import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { RoleModule } from './modules/role/role.module';
 import { UserModule } from './modules/user/user.module';
+import { BlogModule } from './modules/blog/blog.module';
+import { TagsModule } from './modules/tags/tags.module';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { UserModule } from './modules/user/user.module';
     AuthModule,
     UserModule,
     RoleModule,
+    BlogModule,
+    TagsModule,
   ],
   controllers: [AppController],
   providers: [

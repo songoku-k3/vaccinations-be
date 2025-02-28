@@ -36,7 +36,7 @@ Table roles {
 Table tags {
   id String [pk]
   name String [unique, not null]
-  blogs blogs_on_tags [not null]
+  blogs blogs [not null]
 }
 
 Table blogs {
@@ -46,8 +46,9 @@ Table blogs {
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime
   userId String
+  tagId String [not null]
   user users
-  tags blogs_on_tags [not null]
+  tag tags [not null]
 }
 
 Table vaccinations {
@@ -121,17 +122,6 @@ Table users_on_vaccinations {
   }
 }
 
-Table blogs_on_tags {
-  blogId String [not null]
-  tagId String [not null]
-  blog blogs [not null]
-  tag tags [not null]
-
-  indexes {
-    (blogId, tagId) [pk]
-  }
-}
-
 Enum TagType {
   SUC_KHOE
   KHOA_HOC
@@ -173,6 +163,8 @@ Ref: users.roleId > roles.id
 
 Ref: blogs.userId > users.id
 
+Ref: blogs.tagId > tags.id
+
 Ref: notifications.userId > users.id
 
 Ref: bookings.vaccinationId > vaccinations.id
@@ -186,7 +178,3 @@ Ref: payments.userId > users.id
 Ref: users_on_vaccinations.userId > users.id
 
 Ref: users_on_vaccinations.vaccinationId > vaccinations.id
-
-Ref: blogs_on_tags.blogId > blogs.id
-
-Ref: blogs_on_tags.tagId > tags.id
