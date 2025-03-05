@@ -34,6 +34,9 @@ model User {
   Payment                   Payment[]
   Blog                      Blog[]
   Notification              Notification[]
+  SideEffect                SideEffect[]
+  VaccinationRecord         VaccinationRecord[]
+  Appointment               Appointment[]
 
   @@map("users")
 }
@@ -94,8 +97,54 @@ model Vaccination {
   expirationDate    DateTime?
   user              UserOnVaccination[]
   Booking           Booking[]
+  Inventory         Inventory[]
+  SideEffect        SideEffect[]
+  VaccinationRecord VaccinationRecord[]
+  Appointment       Appointment[]
 
   @@map("vaccinations")
+}
+
+// Lịch sử tiêm chủng
+model VaccinationRecord {
+  id              String    @id @default(uuid())
+  userId          String
+  vaccinationId   String
+  doseNumber      Int
+  vaccinationDate DateTime
+  location        String?
+  provider        String?
+  certificate     String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime? @updatedAt
+
+  user        User        @relation(fields: [userId], references: [id])
+  vaccination Vaccination @relation(fields: [vaccinationId], references: [id])
+
+  @@map("vaccination_records")
+}
+
+// Lịch hẹn
+model Appointment {
+  id              String            @id @default(uuid())
+  userId          String
+  vaccinationId   String
+  appointmentDate DateTime
+  status          AppointmentStatus @default(PENDING)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime?         @updatedAt
+
+  user        User        @relation(fields: [userId], references: [id])
+  vaccination Vaccination @relation(fields: [vaccinationId], references: [id])
+
+  @@map("appointments")
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  CANCELED
+  COMPLETED
 }
 
 model Notification {
@@ -115,6 +164,30 @@ enum NotificationType {
   CONFIRMATION
   PAYMENT
   UPDATE
+}
+
+// Kho
+model Inventory {
+  id            String      @id @default(uuid())
+  vaccinationId String      @unique
+  quantity      Int         @default(0)
+  lastUpdated   DateTime    @default(now())
+  Vaccination   Vaccination @relation(fields: [vaccinationId], references: [id])
+
+  @@map("inventory")
+}
+
+// Tác dụng phụ
+model SideEffect {
+  id            String      @id @default(uuid())
+  userId        String
+  vaccinationId String
+  symptoms      String
+  reportedAt    DateTime    @default(now())
+  user          User        @relation(fields: [userId], references: [id])
+  vaccination   Vaccination @relation(fields: [vaccinationId], references: [id])
+
+  @@map("side_effects")
 }
 
 model Booking {
