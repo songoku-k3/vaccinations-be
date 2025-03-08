@@ -59,8 +59,6 @@ Table vaccinations {
   userId String
   vaccineName String [not null]
   image String
-  doseNumber Int [not null]
-  vaccinationDate DateTime [not null]
   location String
   batchNumber String
   provider String
@@ -68,14 +66,33 @@ Table vaccinations {
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime
   remainingQuantity Int
-  manufacturer String
   expirationDate DateTime
+  manufacturerId String
+  supplierId String
+  manufacturer manufacturers
+  supplier suppliers
   user users_on_vaccinations [not null]
   Booking bookings [not null]
   Inventory inventory [not null]
   SideEffect side_effects [not null]
   VaccinationRecord vaccination_records [not null]
   Appointment appointments [not null]
+}
+
+Table manufacturers {
+  id String [pk]
+  name String [unique, not null]
+  country String
+  contactInfo String
+  vaccinations vaccinations [not null]
+}
+
+Table suppliers {
+  id String [pk]
+  name String [unique, not null]
+  address String
+  contactInfo String
+  Vaccination vaccinations [not null]
 }
 
 Table vaccination_records {
@@ -137,16 +154,17 @@ Table bookings {
   id String [pk]
   vaccinationId String
   userId String [not null]
-  Vaccination vaccinations
-  user users [not null]
   vaccinationQuantity Int
   vaccinationPrice Float
   totalAmount Float
   createdAt DateTime [default: `now()`, not null]
   status BookingStatus [not null, default: 'PENDING']
+  vaccinationDate DateTime
   confirmationTime DateTime
   appointmentDate DateTime
   Payment payments [not null]
+  Vaccination vaccinations
+  user users [not null]
 }
 
 Table payments {
@@ -156,6 +174,7 @@ Table payments {
   amount Float [not null]
   paymentMethod PaymentMethod [not null]
   status PaymentStatus [not null]
+  appointmentDate DateTime
   orderId String [unique]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime
@@ -223,6 +242,10 @@ Ref: users.roleId > roles.id
 Ref: blogs.userId > users.id
 
 Ref: blogs.tagId > tags.id
+
+Ref: vaccinations.manufacturerId > manufacturers.id
+
+Ref: vaccinations.supplierId > suppliers.id
 
 Ref: vaccination_records.userId > users.id
 

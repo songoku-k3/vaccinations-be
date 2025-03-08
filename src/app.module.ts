@@ -10,6 +10,9 @@ import { RoleModule } from './modules/role/role.module';
 import { UserModule } from './modules/user/user.module';
 import { BlogModule } from './modules/blog/blog.module';
 import { TagsModule } from './modules/tags/tags.module';
+import { VaccinationsModule } from './modules/vaccinations/vaccinations.module';
+import { SupplierModule } from './modules/supplier/supplier.module';
+import { ManufacturersModule } from './modules/manufacturers/manufacturers.module';
 
 @Module({
   imports: [
@@ -25,6 +28,9 @@ import { TagsModule } from './modules/tags/tags.module';
     RoleModule,
     BlogModule,
     TagsModule,
+    VaccinationsModule,
+    SupplierModule,
+    ManufacturersModule,
   ],
   controllers: [AppController],
   providers: [

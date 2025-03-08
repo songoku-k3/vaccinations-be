@@ -80,21 +80,23 @@ enum TagType {
 }
 
 model Vaccination {
-  id                String              @id @default(uuid())
+  id                String        @id @default(uuid())
   userId            String?
   vaccineName       String
   image             String?
-  doseNumber        Int
-  vaccinationDate   DateTime
   location          String?
   batchNumber       String?
   provider          String?
   certificate       String?
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime?           @updatedAt
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime?     @updatedAt
   remainingQuantity Int?
-  manufacturer      String?
   expirationDate    DateTime?
+  manufacturerId    String?
+  supplierId        String?
+  manufacturer      Manufacturer? @relation(fields: [manufacturerId], references: [id])
+  supplier          Supplier?     @relation(fields: [supplierId], references: [id])
+
   user              UserOnVaccination[]
   Booking           Booking[]
   Inventory         Inventory[]
@@ -103,6 +105,28 @@ model Vaccination {
   Appointment       Appointment[]
 
   @@map("vaccinations")
+}
+
+model Manufacturer {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  country     String?
+  contactInfo String?
+
+  vaccinations Vaccination[]
+
+  @@map("manufacturers")
+}
+
+model Supplier {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  address     String?
+  contactInfo String?
+
+  Vaccination Vaccination[]
+
+  @@map("suppliers")
 }
 
 // Lịch sử tiêm chủng
@@ -194,16 +218,17 @@ model Booking {
   id                  String        @id @default(uuid())
   vaccinationId       String?
   userId              String
-  Vaccination         Vaccination?  @relation(fields: [vaccinationId], references: [id])
-  user                User          @relation(fields: [userId], references: [id])
   vaccinationQuantity Int?
   vaccinationPrice    Float?
   totalAmount         Float?
   createdAt           DateTime      @default(now())
   status              BookingStatus @default(PENDING)
+  vaccinationDate     DateTime?
   confirmationTime    DateTime?
   appointmentDate     DateTime?
   Payment             Payment[]
+  Vaccination         Vaccination?  @relation(fields: [vaccinationId], references: [id])
+  user                User          @relation(fields: [userId], references: [id])
 
   @@map("bookings")
 }
@@ -217,15 +242,16 @@ enum BookingStatus {
 }
 
 model Payment {
-  id            String        @id @default(cuid())
-  bookingId     String?
-  userId        String
-  amount        Float
-  paymentMethod PaymentMethod
-  status        PaymentStatus
-  orderId       String?       @unique
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime?     @updatedAt
+  id              String        @id @default(cuid())
+  bookingId       String?
+  userId          String
+  amount          Float
+  paymentMethod   PaymentMethod
+  status          PaymentStatus
+  appointmentDate DateTime?
+  orderId         String?       @unique
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime?     @updatedAt
 
   booking Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
   user    User     @relation(fields: [userId], references: [id])

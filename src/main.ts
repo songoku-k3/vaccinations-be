@@ -16,8 +16,11 @@ async function bootstrap() {
     .addTag('auth')
     .addTag('blog')
     .addTag('user')
+    .addTag('manufacturers')
+    .addTag('supplier')
     .addTag('tag')
     .addTag('role')
+    .addTag('vaccinations')
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
