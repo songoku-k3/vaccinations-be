@@ -60,8 +60,9 @@ Table vaccinations {
   vaccineName String [not null]
   image String
   location String
+  description String
+  price Float
   batchNumber String
-  provider String
   certificate String
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime

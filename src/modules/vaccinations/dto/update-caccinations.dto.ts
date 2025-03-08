@@ -7,7 +7,7 @@ import {
   IsString,
 } from 'class-validator';
 
-export class CreateVaccinationDto {
+export class UpdateVaccinationDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
@@ -30,17 +30,19 @@ export class CreateVaccinationDto {
   @ApiProperty()
   @IsOptional()
   @IsString()
-  @IsNotEmpty()
   location?: string;
 
+  @ApiProperty()
   @IsOptional()
   @IsString()
   batchNumber?: string;
 
+  @ApiProperty()
   @IsOptional()
   @IsString()
   certificate?: string;
 
+  @ApiProperty()
   @IsOptional()
   @IsInt()
   remainingQuantity?: number;
@@ -50,12 +52,10 @@ export class CreateVaccinationDto {
   expirationDate?: Date;
 
   @ApiProperty()
-  @IsNotEmpty()
   @IsString()
   manufacturerId?: string;
 
   @ApiProperty()
-  @IsNotEmpty()
   @IsString()
   supplierId?: string;
 }
