@@ -58,4 +58,8 @@ export class UpdateVaccinationDto {
   @ApiProperty()
   @IsString()
   supplierId?: string;
+
+  @ApiProperty()
+  @IsString()
+  sideEffect?: string;
 }

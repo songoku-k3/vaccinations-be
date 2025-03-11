@@ -25,7 +25,6 @@ Table users {
   Payment payments [not null]
   Blog blogs [not null]
   Notification notifications [not null]
-  SideEffect side_effects [not null]
   VaccinationRecord vaccination_records [not null]
   Appointment appointments [not null]
 }
@@ -70,12 +69,12 @@ Table vaccinations {
   expirationDate DateTime
   manufacturerId String
   supplierId String
+  sideEffect String
   manufacturer manufacturers
   supplier suppliers
   user users_on_vaccinations [not null]
   Booking bookings [not null]
   Inventory inventory [not null]
-  SideEffect side_effects [not null]
   VaccinationRecord vaccination_records [not null]
   Appointment appointments [not null]
 }
@@ -139,16 +138,6 @@ Table inventory {
   quantity Int [not null, default: 0]
   lastUpdated DateTime [default: `now()`, not null]
   Vaccination vaccinations [not null]
-}
-
-Table side_effects {
-  id String [pk]
-  userId String [not null]
-  vaccinationId String [not null]
-  symptoms String [not null]
-  reportedAt DateTime [default: `now()`, not null]
-  user users [not null]
-  vaccination vaccinations [not null]
 }
 
 Table bookings {
@@ -259,10 +248,6 @@ Ref: appointments.vaccinationId > vaccinations.id
 Ref: notifications.userId > users.id
 
 Ref: inventory.vaccinationId > vaccinations.id
-
-Ref: side_effects.userId > users.id
-
-Ref: side_effects.vaccinationId > vaccinations.id
 
 Ref: bookings.vaccinationId > vaccinations.id
 

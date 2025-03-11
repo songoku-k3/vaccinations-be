@@ -13,6 +13,10 @@ import { TagsModule } from './modules/tags/tags.module';
 import { VaccinationsModule } from './modules/vaccinations/vaccinations.module';
 import { SupplierModule } from './modules/supplier/supplier.module';
 import { ManufacturersModule } from './modules/manufacturers/manufacturers.module';
+import { InventoryModule } from './modules/inventory/inventory.module';
+import { BookingsModule } from './modules/bookings/bookings.module';
+import { MomoModule } from './modules/momo/momo.module';
+import { AppointmentsModule } from './modules/appointments/appointments.module';
 
 @Module({
   imports: [
@@ -31,6 +35,10 @@ import { ManufacturersModule } from './modules/manufacturers/manufacturers.modul
     VaccinationsModule,
     SupplierModule,
     ManufacturersModule,
+    InventoryModule,
+    BookingsModule,
+    MomoModule,
+    AppointmentsModule,
   ],
   controllers: [AppController],
   providers: [

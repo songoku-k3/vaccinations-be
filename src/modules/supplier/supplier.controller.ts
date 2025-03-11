@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { ApiCommonResponses } from 'src/decorator/api-common-responses.decorator';
 import { CommonPagination } from 'src/decorator/common-pagination.decorator';
+import { ApiTagController } from 'src/decorator/common.decorator';
 import {
   Pagination,
   PaginationParams,
@@ -20,6 +21,7 @@ import { SupplierPaginationResponse } from 'src/modules/supplier/dto/supplier.dt
 import { UpdateSupllierDto } from 'src/modules/supplier/dto/update-supllier.dto';
 import { SupplierService } from 'src/modules/supplier/supplier.service';
 
+@ApiTagController('supplier')
 @Controller('supplier')
 export class SupplierController {
   constructor(private readonly supplierService: SupplierService) {}

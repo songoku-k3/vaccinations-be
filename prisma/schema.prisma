@@ -34,7 +34,6 @@ model User {
   Payment                   Payment[]
   Blog                      Blog[]
   Notification              Notification[]
-  SideEffect                SideEffect[]
   VaccinationRecord         VaccinationRecord[]
   Appointment               Appointment[]
 
@@ -95,13 +94,13 @@ model Vaccination {
   expirationDate    DateTime?
   manufacturerId    String?
   supplierId        String?
+  sideEffect        String?
   manufacturer      Manufacturer? @relation(fields: [manufacturerId], references: [id])
   supplier          Supplier?     @relation(fields: [supplierId], references: [id])
 
   user              UserOnVaccination[]
   Booking           Booking[]
   Inventory         Inventory[]
-  SideEffect        SideEffect[]
   VaccinationRecord VaccinationRecord[]
   Appointment       Appointment[]
 
@@ -200,19 +199,6 @@ model Inventory {
   Vaccination   Vaccination @relation(fields: [vaccinationId], references: [id])
 
   @@map("inventory")
-}
-
-// Tác dụng phụ
-model SideEffect {
-  id            String      @id @default(uuid())
-  userId        String
-  vaccinationId String
-  symptoms      String
-  reportedAt    DateTime    @default(now())
-  user          User        @relation(fields: [userId], references: [id])
-  vaccination   Vaccination @relation(fields: [vaccinationId], references: [id])
-
-  @@map("side_effects")
 }
 
 model Booking {
