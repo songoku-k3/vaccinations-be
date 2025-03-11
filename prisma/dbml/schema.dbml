@@ -135,6 +135,7 @@ Table notifications {
 Table inventory {
   id String [pk]
   vaccinationId String [unique, not null]
+  nameVaccine String
   quantity Int [not null, default: 0]
   lastUpdated DateTime [default: `now()`, not null]
   Vaccination vaccinations [not null]

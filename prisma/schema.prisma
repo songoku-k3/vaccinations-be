@@ -194,6 +194,7 @@ enum NotificationType {
 model Inventory {
   id            String      @id @default(uuid())
   vaccinationId String      @unique
+  nameVaccine   String?
   quantity      Int         @default(0)
   lastUpdated   DateTime    @default(now())
   Vaccination   Vaccination @relation(fields: [vaccinationId], references: [id])

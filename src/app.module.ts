@@ -17,12 +17,14 @@ import { InventoryModule } from './modules/inventory/inventory.module';
 import { BookingsModule } from './modules/bookings/bookings.module';
 import { MomoModule } from './modules/momo/momo.module';
 import { AppointmentsModule } from './modules/appointments/appointments.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    ScheduleModule.forRoot(),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads',
