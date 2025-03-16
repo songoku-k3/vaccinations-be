@@ -21,6 +21,7 @@ async function bootstrap() {
     .addTag('inventory')
     .addTag('manufacturers')
     .addTag('momo')
+    .addTag('notifications')
     .addTag('supplier')
     .addTag('tag')
     .addTag('role')

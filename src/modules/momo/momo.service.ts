@@ -1,5 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { BookingStatus, PaymentMethod, PaymentStatus } from '@prisma/client';
+import {
+  AppointmentStatus,
+  BookingStatus,
+  PaymentMethod,
+  PaymentStatus,
+} from '@prisma/client';
 import axios from 'axios';
 import * as crypto from 'crypto';
 import {
@@ -151,13 +156,34 @@ export class MomoService {
     if (status === PaymentStatus.COMPLETED) {
       const bookingId = payment.bookingId;
 
-      await this.prismaService.booking.update({
+      const updatedBooking = await this.prismaService.booking.update({
         where: { id: bookingId },
         data: {
           status: BookingStatus.CONFIRMED,
           confirmationTime: new Date(),
         },
       });
+
+      const appointment = await this.prismaService.appointment.findFirst({
+        where: {
+          userId: payment.userId,
+          vaccinationId: updatedBooking.vaccinationId,
+          appointmentDate: updatedBooking.appointmentDate,
+        },
+      });
+
+      if (appointment) {
+        await this.prismaService.appointment.update({
+          where: { id: appointment.id },
+          data: {
+            status: AppointmentStatus.COMPLETED,
+            updatedAt: new Date(),
+          },
+        });
+        console.log(`Appointment ${appointment.id} updated to COMPLETED`);
+      } else {
+        console.warn('No matching appointment found for booking:', bookingId);
+      }
     }
 
     return updatedPayment;
