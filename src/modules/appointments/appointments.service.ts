@@ -78,14 +78,35 @@ export class AppointmentsService {
     data: UpdateAppointmentDto,
     userId: string,
   ) {
-    return this.prismaService.appointment.update({
-      where: {
-        id,
-      },
-      data: {
-        ...data,
-        userId,
-      },
+    return this.prismaService.$transaction(async (prisma) => {
+      const updatedAppointment = await prisma.appointment.update({
+        where: { id },
+        data: {
+          ...data,
+          userId,
+        },
+        include: {
+          vaccination: true,
+        },
+      });
+
+      if (updatedAppointment.status === 'COMPLETED') {
+        await prisma.vaccinationRecord.create({
+          data: {
+            userId: updatedAppointment.userId,
+            vaccinationId: updatedAppointment.vaccinationId,
+            doseNumber: 1,
+            vaccinationDate: updatedAppointment.appointmentDate,
+            location: updatedAppointment.vaccination?.location || 'Unknown',
+            provider:
+              updatedAppointment.vaccination?.manufacturerId || 'Unknown',
+            certificate: `CERT-${updatedAppointment.id}-${Date.now()}`,
+            createdAt: new Date(),
+          },
+        });
+      }
+
+      return updatedAppointment;
     });
   }
 
