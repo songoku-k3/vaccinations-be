@@ -25,6 +25,11 @@ import { HandleAuthGuard } from 'src/modules/auth/guard/auth.guard';
 export class AppointmentsController {
   constructor(private readonly appointmentsService: AppointmentsService) {}
 
+  @Get('daily')
+  async getAppointmentsByDate() {
+    return this.appointmentsService.getTodayAppointments();
+  }
+
   @CommonPagination()
   @ApiCommonResponses('Lấy danh sách lịch hẹn')
   @Get()

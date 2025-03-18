@@ -3,7 +3,10 @@ import {
   Pagination,
   PaginationParams,
 } from 'src/decorator/pagination.decorator';
-import { AppointmentPaginationtype } from 'src/modules/appointments/dto/appointments.dto';
+import {
+  AppointmentPaginationtype,
+  DailyAppointmentsResponse,
+} from 'src/modules/appointments/dto/appointments.dto';
 import { PrismaService } from 'src/prisma.service';
 import { UpdateAppointmentDto } from './dto/update-appointments.dto';
 
@@ -118,6 +121,54 @@ export class AppointmentsService {
     });
     return {
       message: 'Delete appointment successfully',
+    };
+  }
+
+  async getTodayAppointments(): Promise<DailyAppointmentsResponse> {
+    const today = new Date();
+    const startOfDay = new Date(today);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(today);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const appointments = await this.prismaService.appointment.findMany({
+      where: {
+        appointmentDate: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true,
+          },
+        },
+        vaccination: {
+          select: {
+            id: true,
+            vaccineName: true,
+            location: true,
+          },
+        },
+      },
+      orderBy: {
+        appointmentDate: 'asc',
+      },
+    });
+
+    const formattedDate = startOfDay.toISOString().split('T')[0];
+
+    return {
+      data: {
+        date: formattedDate,
+        total: appointments.length,
+        appointments,
+      },
     };
   }
 }
