@@ -5,8 +5,10 @@ import {
   Get,
   Param,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
+import { ApiQuery } from '@nestjs/swagger';
 import { ApiCommonResponses } from 'src/decorator/api-common-responses.decorator';
 import { CommonPagination } from 'src/decorator/common-pagination.decorator';
 import { ApiTagController } from 'src/decorator/common.decorator';
@@ -16,7 +18,10 @@ import {
   PaginationParams,
 } from 'src/decorator/pagination.decorator';
 import { AppointmentsService } from 'src/modules/appointments/appointments.service';
-import { AppointmentPaginationtype } from 'src/modules/appointments/dto/appointments.dto';
+import {
+  AppointmentPaginationtype,
+  DailyAppointmentsResponse,
+} from 'src/modules/appointments/dto/appointments.dto';
 import { UpdateAppointmentDto } from 'src/modules/appointments/dto/update-appointments.dto';
 import { HandleAuthGuard } from 'src/modules/auth/guard/auth.guard';
 
@@ -25,9 +30,17 @@ import { HandleAuthGuard } from 'src/modules/auth/guard/auth.guard';
 export class AppointmentsController {
   constructor(private readonly appointmentsService: AppointmentsService) {}
 
+  @ApiCommonResponses('Lấy danh sách lịch hẹn hôm nay')
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    type: String,
+  })
   @Get('daily')
-  async getAppointmentsByDate() {
-    return this.appointmentsService.getTodayAppointments();
+  async getTodayAppointments(
+    @Query('search') search?: string,
+  ): Promise<DailyAppointmentsResponse> {
+    return this.appointmentsService.getTodayAppointments(search);
   }
 
   @CommonPagination()

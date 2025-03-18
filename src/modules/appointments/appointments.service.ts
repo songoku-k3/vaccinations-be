@@ -9,6 +9,7 @@ import {
 } from 'src/modules/appointments/dto/appointments.dto';
 import { PrismaService } from 'src/prisma.service';
 import { UpdateAppointmentDto } from './dto/update-appointments.dto';
+import { getUTCDayRange } from 'src/utils/date-utils';
 
 @Injectable()
 export class AppointmentsService {
@@ -124,13 +125,11 @@ export class AppointmentsService {
     };
   }
 
-  async getTodayAppointments(): Promise<DailyAppointmentsResponse> {
+  async getTodayAppointments(
+    search?: string,
+  ): Promise<DailyAppointmentsResponse> {
     const today = new Date();
-    const startOfDay = new Date(today);
-    startOfDay.setHours(0, 0, 0, 0);
-
-    const endOfDay = new Date(today);
-    endOfDay.setHours(23, 59, 59, 999);
+    const { startOfDay, endOfDay } = getUTCDayRange(today);
 
     const appointments = await this.prismaService.appointment.findMany({
       where: {
@@ -138,6 +137,14 @@ export class AppointmentsService {
           gte: startOfDay,
           lte: endOfDay,
         },
+        ...(search && {
+          vaccination: {
+            vaccineName: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        }),
       },
       include: {
         user: {
@@ -153,6 +160,9 @@ export class AppointmentsService {
             id: true,
             vaccineName: true,
             location: true,
+            manufacturerId: true,
+            price: true,
+            expirationDate: true,
           },
         },
       },
