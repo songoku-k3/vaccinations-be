@@ -447,4 +447,74 @@ export class AuthService {
       return null;
     }
   }
+
+  async createUserByAdmin(
+    userData: RegisterDto,
+  ): Promise<{ message: string; user: any }> {
+    const existingUser = await this.prismaService.user.findUnique({
+      where: { email: userData.email },
+    });
+    if (existingUser) {
+      throw new HttpException(
+        { message: 'Email đã được sử dụng' },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const employeeRole = await this.getEmployeeRole();
+
+    const hashedPassword = await hash(
+      userData.password,
+      AuthService.BCRYPT_SALT_ROUNDS,
+    );
+
+    const newUser = await this.prismaService.user.create({
+      data: {
+        email: userData.email,
+        password: hashedPassword,
+        name: userData.name,
+        phone: userData.phone,
+        confirmPassword: hashedPassword,
+        isVerified: true,
+        role: {
+          connect: { id: employeeRole.id },
+        },
+      },
+      include: { role: true },
+    });
+
+    return {
+      message: 'Tạo tài khoản thành công',
+      user: this.formatUserResponse(newUser),
+    };
+  }
+
+  private async validateAdminRole(user: User): Promise<void> {
+    const adminUser = await this.prismaService.user.findUnique({
+      where: { id: user.id },
+      include: { role: true },
+    });
+
+    if (!adminUser || adminUser.role.name !== 'ADMIN') {
+      throw new HttpException(
+        { message: 'Chỉ admin mới có quyền tạo user' },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
+
+  private async getEmployeeRole() {
+    const employeeRole = await this.prismaService.role.findUnique({
+      where: { name: 'EMPLOYEE' },
+    });
+
+    if (!employeeRole) {
+      throw new HttpException(
+        { message: 'Không tìm thấy vai trò EMPLOYEE' },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    return employeeRole;
+  }
 }

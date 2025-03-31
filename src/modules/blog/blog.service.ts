@@ -25,6 +25,12 @@ export class BlogService {
           contains: search,
         },
       },
+      include: {
+        user: {
+          select: USER_FIELDS,
+        },
+        tag: true,
+      },
       skip,
       take: itemsPerPage,
     });

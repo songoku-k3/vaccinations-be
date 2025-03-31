@@ -2,6 +2,7 @@ import { Body, Controller, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 import { ApiCommonResponses } from 'src/decorator/api-common-responses.decorator';
+import { Roles } from 'src/decorator/roles.decorator';
 import { AuthService } from 'src/modules/auth/auth.service';
 import { CurrentUser } from 'src/modules/auth/decorator/current-user.decorator';
 import {
@@ -79,5 +80,13 @@ export class AuthController {
       password,
       confirm_password,
     );
+  }
+
+  @Post('register/admin')
+  @UseGuards(HandleAuthGuard)
+  @Roles('ADMIN')
+  @ApiCommonResponses('Tạo tài khoản user')
+  async createUser(@Body() data: RegisterDto) {
+    return this.authService.createUserByAdmin(data);
   }
 }

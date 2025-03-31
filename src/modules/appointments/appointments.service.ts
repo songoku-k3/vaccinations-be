@@ -10,6 +10,7 @@ import {
 import { PrismaService } from 'src/prisma.service';
 import { UpdateAppointmentDto } from './dto/update-appointments.dto';
 import { getUTCDayRange } from 'src/utils/date-utils';
+import { USER_FIELDS } from 'src/configs/const';
 
 @Injectable()
 export class AppointmentsService {
@@ -23,6 +24,12 @@ export class AppointmentsService {
       where: {
         vaccinationId: {
           contains: search,
+        },
+      },
+      include: {
+        vaccination: true,
+        user: {
+          select: USER_FIELDS,
         },
       },
       skip,

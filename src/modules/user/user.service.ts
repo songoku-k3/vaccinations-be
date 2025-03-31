@@ -6,6 +6,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { Prisma, User } from '@prisma/client';
 import { isEqual } from 'lodash';
 import { FileUploadService } from 'src/lib/file-upload.service';
@@ -17,6 +18,7 @@ export class UserService {
   constructor(
     private prismaService: PrismaService,
     private fileUploadService: FileUploadService,
+    private jwtService: JwtService,
   ) {}
 
   async getAll(filters: UserFilterType): Promise<any> {

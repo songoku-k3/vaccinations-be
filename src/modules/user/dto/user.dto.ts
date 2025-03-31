@@ -9,16 +9,20 @@ import {
 } from 'class-validator';
 
 export class CreateUserDto {
+  @ApiProperty()
   @IsNotEmpty()
   name: string;
 
+  @ApiProperty()
   @Matches(/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/)
   phone: string;
 
+  @ApiProperty()
   @IsNotEmpty()
   @IsEmail()
   email: string;
 
+  @ApiProperty()
   @IsNotEmpty()
   @MinLength(6)
   password: string;
