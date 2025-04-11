@@ -247,6 +247,15 @@ model Payment {
   @@map("payments")
 }
 
+model BlacklistedToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@map("blacklisted_tokens")
+}
+
 enum PaymentMethod {
   CASH
   CREDIT_CARD

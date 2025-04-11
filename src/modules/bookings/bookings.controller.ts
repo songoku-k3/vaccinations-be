@@ -9,7 +9,10 @@ import {
 } from 'src/decorator/pagination.decorator';
 import { HandleAuthGuard } from 'src/modules/auth/guard/auth.guard';
 import { BookingsService } from 'src/modules/bookings/bookings.service';
-import { BookingPaginationtype } from 'src/modules/bookings/dto/bookings.dto';
+import {
+  BookingPaginationtype,
+  ConfirmBookingDto,
+} from 'src/modules/bookings/dto/bookings.dto';
 import { CreateVaccinationBookingDto } from 'src/modules/bookings/dto/create-booking.dto';
 
 @ApiTagController('bookings')
@@ -40,5 +43,15 @@ export class BookingsController {
     @CurrentUserId() userId: string,
   ) {
     return this.bookingsService.bookVaccination(createBookingDto, userId);
+  }
+
+  @UseGuards(HandleAuthGuard)
+  @ApiCommonResponses('Đặt lịch trả tiền mặt')
+  @Post('confirm')
+  async confirmBooking(
+    @Body() body: ConfirmBookingDto,
+    @CurrentUserId() userId: string,
+  ) {
+    return this.bookingsService.confirmBooking(body.bookingId, userId);
   }
 }

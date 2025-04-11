@@ -420,34 +420,6 @@ export class AuthService {
     }
   }
 
-  async refreshToken(
-    refreshTokenDto: RefreshTokenDto,
-  ): Promise<{ access_token: string }> {
-    const userId = await this.validateRefreshToken(
-      refreshTokenDto.refresh_token,
-    );
-    if (!userId) {
-      throw new UnauthorizedException('Invalid refresh token');
-    }
-
-    const user = await this.userService.getDetail(userId);
-    const access_token = this.jwtService.sign({
-      id: user.id,
-      email: user.email,
-    });
-
-    return { access_token };
-  }
-
-  private async validateRefreshToken(token: string): Promise<string | null> {
-    try {
-      const decoded = this.jwtService.verify(token);
-      return decoded.userId;
-    } catch (error) {
-      return null;
-    }
-  }
-
   async createUserByAdmin(
     userData: RegisterDto,
   ): Promise<{ message: string; user: any }> {
@@ -516,5 +488,96 @@ export class AuthService {
     }
 
     return employeeRole;
+  }
+
+  // logout
+  async logout(refreshToken: string): Promise<{ message: string }> {
+    if (!refreshToken) {
+      throw new HttpException(
+        { message: 'Refresh token is required' },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const payload = await this.validateRefreshToken(refreshToken);
+    if (!payload) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    await this.blacklistToken(refreshToken);
+
+    return { message: 'Logged out successfully' };
+  }
+
+  private async blacklistToken(refreshToken: string): Promise<void> {
+    try {
+      const decoded = this.jwtService.verify(refreshToken, {
+        secret: process.env.REFRESH_TOKEN_KEY,
+      });
+
+      const expiresAt = new Date(decoded.exp * 1000);
+
+      await this.prismaService.blacklistedToken.create({
+        data: {
+          token: refreshToken,
+          expiresAt,
+        },
+      });
+    } catch (error) {
+      throw new HttpException(
+        { message: 'Failed to blacklist token' },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  private async validateRefreshToken(token: string): Promise<any> {
+    try {
+      const blacklisted = await this.prismaService.blacklistedToken.findUnique({
+        where: { token },
+      });
+
+      if (blacklisted) {
+        throw new UnauthorizedException('Token has been invalidated');
+      }
+
+      const decoded = this.jwtService.verify(token, {
+        secret: process.env.REFRESH_TOKEN_KEY,
+      });
+      return decoded;
+    } catch (error) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+  }
+
+  async refreshToken(
+    refreshTokenDto: RefreshTokenDto,
+  ): Promise<{ access_token: string }> {
+    const payload = await this.validateRefreshToken(
+      refreshTokenDto.refresh_token,
+    );
+    if (!payload) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    const user = await this.userService.getDetail(payload.id);
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    const access_token = this.jwtService.sign(
+      {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role?.name,
+      },
+      {
+        secret: process.env.ACCESS_TOKEN_KEY,
+        expiresIn: '1d',
+      },
+    );
+
+    return { access_token };
   }
 }

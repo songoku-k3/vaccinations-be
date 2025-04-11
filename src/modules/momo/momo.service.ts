@@ -25,7 +25,7 @@ export class MomoService {
   private readonly YOUR_SECRET_KEY = 'K951B6PE1waDMi640xX08PD3vg6EkVlz';
   private readonly PARTNER_CODE = 'MOMO';
   private readonly ACCESS_KEY = 'F8BBA842ECF85';
-  private readonly REDIRECT_URL = 'http://localhost:4040';
+  private readonly REDIRECT_URL = 'http://localhost:4000';
   private readonly IPN_URL =
     'https://ceaa-103-156-46-86.ngrok-free.app/api/momo/ipn';
 
