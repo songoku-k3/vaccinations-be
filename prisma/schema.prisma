@@ -79,32 +79,44 @@ enum TagType {
 }
 
 model Vaccination {
-  id                String        @id @default(uuid())
-  userId            String?
-  vaccineName       String
-  image             String?
-  location          String?
-  description       String?
-  price             Float?
-  batchNumber       String?
-  certificate       String?
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime?     @updatedAt
-  remainingQuantity Int?
-  expirationDate    DateTime?
-  manufacturerId    String?
-  supplierId        String?
-  sideEffect        String?
-  manufacturer      Manufacturer? @relation(fields: [manufacturerId], references: [id])
-  supplier          Supplier?     @relation(fields: [supplierId], references: [id])
+  id                    String        @id @default(uuid())
+  userId                String?
+  vaccineName           String
+  image                 String?
+  location              String?
+  description           String?
+  price                 Float?
+  batchNumber           String?
+  certificate           String?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime?     @updatedAt
+  remainingQuantity     Int?
+  expirationDate        DateTime?
+  manufacturerId        String?
+  supplierId            String?
+  sideEffect            String?
+  categoryVaccinationId String?
+  manufacturer          Manufacturer? @relation(fields: [manufacturerId], references: [id])
+  supplier              Supplier?     @relation(fields: [supplierId], references: [id])
 
-  user              UserOnVaccination[]
-  Booking           Booking[]
-  Inventory         Inventory[]
-  VaccinationRecord VaccinationRecord[]
-  Appointment       Appointment[]
+  user                UserOnVaccination[]
+  Booking             Booking[]
+  Inventory           Inventory[]
+  VaccinationRecord   VaccinationRecord[]
+  Appointment         Appointment[]
+  CategoryVaccination CategoryVaccination? @relation(fields: [categoryVaccinationId], references: [id])
 
   @@map("vaccinations")
+}
+
+model CategoryVaccination {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  description String?
+
+  vaccines Vaccination[]
+
+  @@map("category_vaccinations")
 }
 
 model Manufacturer {

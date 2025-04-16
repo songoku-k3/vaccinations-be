@@ -62,4 +62,8 @@ export class UpdateVaccinationDto {
   @ApiProperty()
   @IsString()
   sideEffect?: string;
+
+  @ApiProperty()
+  @IsString()
+  categoryVaccinationId?: string;
 }

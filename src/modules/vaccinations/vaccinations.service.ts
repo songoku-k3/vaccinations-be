@@ -5,6 +5,7 @@ import {
   Pagination,
   PaginationParams,
 } from 'src/decorator/pagination.decorator';
+import { FileUploadService } from 'src/lib/file-upload.service';
 import { CreateVaccinationDto } from 'src/modules/vaccinations/dto/create-vaccinations.dto';
 import { UpdateVaccinationDto } from 'src/modules/vaccinations/dto/update-caccinations.dto';
 import { VaccinationPaginationResponseType } from 'src/modules/vaccinations/dto/vaccinations.dto';
@@ -12,7 +13,10 @@ import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class VaccinationsService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly fileUploadService: FileUploadService,
+  ) {}
 
   private generateBatchNumber(): string {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -71,12 +75,23 @@ export class VaccinationsService {
   async create(
     data: CreateVaccinationDto,
     userId: string,
+    imageFile?: Express.Multer.File,
   ): Promise<Vaccination> {
     try {
+      let imageUrl = data.image;
+
+      if (imageFile) {
+        imageUrl = await this.fileUploadService.uploadImageToS3(
+          imageFile,
+          'vaccinations',
+        );
+      }
+
       return await this.prismaService.vaccination.create({
         data: {
           ...data,
           userId,
+          image: imageUrl,
           batchNumber: this.generateBatchNumber(),
           remainingQuantity: numberConstants.ONE,
           user: {
@@ -93,12 +108,29 @@ export class VaccinationsService {
     }
   }
 
-  async update(id: string, data: UpdateVaccinationDto): Promise<Vaccination> {
+  async update(
+    id: string,
+    data: UpdateVaccinationDto,
+    imageFile?: Express.Multer.File,
+  ): Promise<Vaccination> {
     try {
       await this.getById(id);
+
+      let imageUrl = data.image;
+
+      if (imageFile) {
+        imageUrl = await this.fileUploadService.uploadImageToS3(
+          imageFile,
+          'vaccinations',
+        );
+      }
+
       return await this.prismaService.vaccination.update({
         where: { id },
-        data,
+        data: {
+          ...data,
+          image: imageUrl,
+        },
       });
     } catch (error) {
       if (error instanceof NotFoundException) throw error;

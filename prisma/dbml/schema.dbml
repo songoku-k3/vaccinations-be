@@ -70,6 +70,7 @@ Table vaccinations {
   manufacturerId String
   supplierId String
   sideEffect String
+  categoryVaccinationId String
   manufacturer manufacturers
   supplier suppliers
   user users_on_vaccinations [not null]
@@ -77,6 +78,14 @@ Table vaccinations {
   Inventory inventory [not null]
   VaccinationRecord vaccination_records [not null]
   Appointment appointments [not null]
+  CategoryVaccination category_vaccinations
+}
+
+Table category_vaccinations {
+  id String [pk]
+  name String [unique, not null]
+  description String
+  vaccines vaccinations [not null]
 }
 
 Table manufacturers {
@@ -244,6 +253,8 @@ Ref: blogs.tagId > tags.id
 Ref: vaccinations.manufacturerId > manufacturers.id
 
 Ref: vaccinations.supplierId > suppliers.id
+
+Ref: vaccinations.categoryVaccinationId > category_vaccinations.id
 
 Ref: vaccination_records.userId > users.id
 

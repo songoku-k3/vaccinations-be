@@ -10,7 +10,7 @@ import {
 import { PrismaService } from 'src/prisma.service';
 import { UpdateAppointmentDto } from './dto/update-appointments.dto';
 import { getUTCDayRange } from 'src/utils/date-utils';
-import { USER_FIELDS } from 'src/configs/const';
+import { USER_FIELDS, VACCINE_FIELDS } from 'src/configs/const';
 
 @Injectable()
 export class AppointmentsService {
@@ -27,7 +27,13 @@ export class AppointmentsService {
         },
       },
       include: {
-        vaccination: true,
+        vaccination: {
+          select: {
+            ...VACCINE_FIELDS,
+            supplier: true,
+            manufacturer: true,
+          },
+        },
         user: {
           select: USER_FIELDS,
         },
@@ -59,27 +65,16 @@ export class AppointmentsService {
       include: {
         user: {
           select: {
-            id: true,
-            email: true,
-            phone: true,
-            address: true,
-            avatar: true,
-            name: true,
-            date_of_birth: true,
-            country: true,
-            createAt: true,
-            updateAt: true,
-            verificationCode: true,
-            verificationCodeExpiresAt: true,
-            isVerified: true,
-            role: {
-              select: {
-                name: true,
-              },
-            },
+            ...USER_FIELDS,
           },
         },
-        vaccination: true,
+        vaccination: {
+          select: {
+            ...VACCINE_FIELDS,
+            supplier: true,
+            manufacturer: true,
+          },
+        },
       },
     });
   }
@@ -155,12 +150,7 @@ export class AppointmentsService {
       },
       include: {
         user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            phone: true,
-          },
+          select: USER_FIELDS,
         },
         vaccination: {
           select: {
@@ -170,6 +160,7 @@ export class AppointmentsService {
             manufacturerId: true,
             price: true,
             expirationDate: true,
+            image: true,
           },
         },
       },

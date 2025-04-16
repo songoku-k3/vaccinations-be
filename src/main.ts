@@ -17,6 +17,7 @@ async function bootstrap() {
     .addTag('appointments')
     .addTag('blog')
     .addTag('bookings')
+    .addTag('category-vaccine')
     .addTag('user')
     .addTag('inventory')
     .addTag('manufacturers')

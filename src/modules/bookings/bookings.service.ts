@@ -9,6 +9,7 @@ import { BookingPaginationtype } from 'src/modules/bookings/dto/bookings.dto';
 import { CreateVaccinationBookingDto } from 'src/modules/bookings/dto/create-booking.dto';
 import { PrismaService } from 'src/prisma.service';
 import { mailService } from '../../lib/mail.service';
+import { USER_FIELDS, VACCINE_FIELDS } from 'src/configs/const';
 
 @Injectable()
 export class BookingsService {
@@ -42,6 +43,18 @@ export class BookingsService {
           contains: search,
         },
       },
+      include: {
+        user: {
+          select: USER_FIELDS,
+        },
+        Vaccination: {
+          select: {
+            ...VACCINE_FIELDS,
+            supplier: true,
+            manufacturer: true,
+          },
+        },
+      },
       skip,
       take: itemsPerPage,
     });
@@ -65,6 +78,18 @@ export class BookingsService {
     return this.prismaService.booking.findFirst({
       where: {
         id,
+      },
+      select: {
+        user: {
+          select: USER_FIELDS,
+        },
+        Vaccination: {
+          select: {
+            ...VACCINE_FIELDS,
+            supplier: true,
+            manufacturer: true,
+          },
+        },
       },
     });
   }

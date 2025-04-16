@@ -19,6 +19,7 @@ import { MomoModule } from './modules/momo/momo.module';
 import { AppointmentsModule } from './modules/appointments/appointments.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { CategoryVaccineModule } from './modules/category-vaccine/category-vaccine.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     MomoModule,
     AppointmentsModule,
     NotificationsModule,
+    CategoryVaccineModule,
   ],
   controllers: [AppController],
   providers: [

@@ -58,4 +58,9 @@ export class CreateVaccinationDto {
   @IsNotEmpty()
   @IsString()
   supplierId?: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  categoryVaccinationId?: string;
 }
