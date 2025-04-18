@@ -260,7 +260,7 @@ Ref: vaccination_records.userId > users.id
 
 Ref: vaccination_records.vaccinationId > vaccinations.id
 
-Ref: appointments.userId > users.id
+Ref: appointments.userId > users.id [delete: Cascade]
 
 Ref: appointments.vaccinationId > vaccinations.id
 

@@ -10,18 +10,18 @@ export class ResetPasswordDto {
   @ApiProperty()
   @IsNotEmpty()
   @MinLength(6)
-  @Matches(/^(?=.*[A-Z])(?=.*\d).+$/, {
+  @Matches(/^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]).+$/, {
     message:
-      'Password must contain at least one uppercase letter and one number',
+      'Mật khẩu phải chứa ít nhất một chữ hoa, một số, một kí tự đặc biệt',
   })
   newPassword: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @MinLength(6)
-  @Matches(/^(?=.*[A-Z])(?=.*\d).+$/, {
+  @Matches(/^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]).+$/, {
     message:
-      'Password must contain at least one uppercase letter and one number',
+      'Mật khẩu phải chứa ít nhất một chữ hoa, một số, một kí tự đặc biệt',
   })
   confirm_password: string;
 }
@@ -35,18 +35,18 @@ export class ChangePasswordDto {
   @ApiProperty()
   @IsNotEmpty()
   @MinLength(6)
-  @Matches(/^(?=.*[A-Z])(?=.*\d).+$/, {
+  @Matches(/^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]).+$/, {
     message:
-      'Password must contain at least one uppercase letter and one number',
+      'Mật khẩu phải chứa ít nhất một chữ hoa, một số, một kí tự đặc biệt',
   })
   password: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @MinLength(6)
-  @Matches(/^(?=.*[A-Z])(?=.*\d).+$/, {
+  @Matches(/^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]).+$/, {
     message:
-      'Password must contain at least one uppercase letter and one number',
+      'Mật khẩu phải chứa ít nhất một chữ hoa, một số, một kí tự đặc biệt',
   })
   confirm_password: string;
 }

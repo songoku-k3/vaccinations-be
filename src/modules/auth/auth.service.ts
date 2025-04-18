@@ -204,7 +204,7 @@ export class AuthService {
 
     if (!user) {
       throw new HttpException(
-        { message: 'Account not found' },
+        { message: 'Email hoặc mật khẩu không chính xác' },
         HttpStatus.UNAUTHORIZED,
       );
     }
@@ -226,7 +226,7 @@ export class AuthService {
     const isPasswordValid = await compare(credentials.password, user.password);
     if (!isPasswordValid) {
       throw new HttpException(
-        { message: 'Password is not correct' },
+        { message: 'Email hoặc mật khẩu không đúng.' },
         HttpStatus.UNAUTHORIZED,
       );
     }
@@ -298,7 +298,7 @@ export class AuthService {
 
     if (!user) {
       throw new HttpException(
-        { message: `Email ${email} not found` },
+        { message: `Email ${email} không tồn tại` },
         HttpStatus.UNAUTHORIZED,
       );
     }
