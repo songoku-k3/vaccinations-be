@@ -278,4 +278,4 @@ Ref: payments.userId > users.id
 
 Ref: users_on_vaccinations.userId > users.id
 
-Ref: users_on_vaccinations.vaccinationId > vaccinations.id
+Ref: users_on_vaccinations.vaccinationId > vaccinations.id [delete: Cascade]

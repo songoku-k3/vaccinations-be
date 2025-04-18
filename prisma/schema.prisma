@@ -286,7 +286,7 @@ model UserOnVaccination {
   userId        String
   user          User        @relation(fields: [userId], references: [id])
   vaccinationId String
-  vaccination   Vaccination @relation(fields: [vaccinationId], references: [id])
+  vaccination   Vaccination @relation(fields: [vaccinationId], references: [id], onDelete: Cascade)
 
   @@id([userId, vaccinationId])
   @@map("users_on_vaccinations")

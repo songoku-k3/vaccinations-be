@@ -41,6 +41,9 @@ export class VaccinationsService {
             mode: 'insensitive',
           },
         },
+        include: {
+          CategoryVaccination: true,
+        },
         skip,
         take: itemsPerPage,
       }),
