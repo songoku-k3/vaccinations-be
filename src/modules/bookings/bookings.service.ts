@@ -262,4 +262,10 @@ export class BookingsService {
         'Đặt chỗ đã được xác nhận, phương thức thanh toán là CASH, và email đã được gửi thành công',
     };
   }
+
+  async deleteBooking(bookingId: string) {
+    return this.prismaService.booking.delete({
+      where: { id: bookingId },
+    });
+  }
 }

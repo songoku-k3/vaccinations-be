@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiCommonResponses } from 'src/decorator/api-common-responses.decorator';
 import { CommonPagination } from 'src/decorator/common-pagination.decorator';
 import { ApiTagController } from 'src/decorator/common.decorator';
@@ -14,6 +22,8 @@ import {
   ConfirmBookingDto,
 } from 'src/modules/bookings/dto/bookings.dto';
 import { CreateVaccinationBookingDto } from 'src/modules/bookings/dto/create-booking.dto';
+import { Roles } from 'src/decorator/roles.decorator';
+import { RolesGuard } from 'src/guard/roles.guard';
 
 @ApiTagController('bookings')
 @Controller('bookings')
@@ -53,5 +63,13 @@ export class BookingsController {
     @CurrentUserId() userId: string,
   ) {
     return this.bookingsService.confirmBooking(body.bookingId, userId);
+  }
+
+  @UseGuards(HandleAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiCommonResponses('Xóa booking')
+  @Delete(':id')
+  async deleteBooking(@Param('id') id: string) {
+    return this.bookingsService.deleteBooking(id);
   }
 }

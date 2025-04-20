@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -19,6 +20,8 @@ import {
   Pagination,
   PaginationParams,
 } from 'src/decorator/pagination.decorator';
+import { Roles } from 'src/decorator/roles.decorator';
+import { RolesGuard } from 'src/guard/roles.guard';
 import { HandleAuthGuard } from 'src/modules/auth/guard/auth.guard';
 import {
   ChangeStatusPaymentDto,
@@ -106,5 +109,13 @@ export class MomoController {
     @Body() status: ChangeStatusPaymentDto,
   ) {
     return this.momoService.changeStatusPayment(id, status.status);
+  }
+
+  @UseGuards(HandleAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiCommonResponses('Xóa giao dịch thanh toán')
+  @Delete('payment/:id')
+  async deletePayment(@Param('id') id: string) {
+    return this.momoService.deletePayment(id);
   }
 }

@@ -358,6 +358,7 @@ export class MomoService {
     });
     return { data: { total } };
   }
+
   async changeStatusPayment(paymentId: string, status: PaymentStatus) {
     const payment = await this.prismaService.payment.findUnique({
       where: { id: paymentId },
@@ -366,6 +367,13 @@ export class MomoService {
 
     if (!payment) {
       throw new HttpException('Payment not found', HttpStatus.NOT_FOUND);
+    }
+
+    if (payment.paymentMethod !== PaymentMethod.CASH) {
+      throw new HttpException(
+        'Can only update status for CASH payment method',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     await this.prismaService.$transaction([
@@ -385,5 +393,11 @@ export class MomoService {
     ]);
 
     return { message: 'Updated payment and booking status successfully' };
+  }
+
+  async deletePayment(paymentId: string) {
+    return this.prismaService.payment.delete({
+      where: { id: paymentId },
+    });
   }
 }
