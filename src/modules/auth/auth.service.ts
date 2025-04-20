@@ -580,4 +580,29 @@ export class AuthService {
 
     return { access_token };
   }
+
+  async resendVerificationEmail(email: string) {
+    const user = await this.prismaService.user.findUnique({
+      where: { email },
+    });
+    if (!user) {
+      throw new HttpException(
+        { message: `Email ${email} không tồn tại` },
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+    if (user.isVerified) {
+      throw new HttpException(
+        { message: 'Email đã được xác thực' },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const verificationData = this.generateVerificationCode();
+    await this.sendVerificationEmail({
+      email: user.email,
+      verificationCode: verificationData.code,
+    });
+
+    return { message: 'Email xác thực đã được gửi lại' };
+  }
 }

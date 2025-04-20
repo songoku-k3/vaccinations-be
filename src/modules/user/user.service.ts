@@ -197,4 +197,11 @@ export class UserService {
     const totalUsers = await this.prismaService.user.count();
     return { data: { total: totalUsers } };
   }
+
+  // get list user by role === USER
+  async getListUserByRole(): Promise<User[]> {
+    return this.prismaService.user.findMany({
+      where: { role: { name: 'USER' } },
+    });
+  }
 }

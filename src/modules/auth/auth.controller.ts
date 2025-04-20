@@ -97,4 +97,10 @@ export class AuthController {
   async createUser(@Body() data: RegisterDto) {
     return this.authService.createUserByAdmin(data);
   }
+
+  @Post('resend-verification-email')
+  @ApiCommonResponses('Gửi lại email xác thực')
+  async resendVerificationEmail(@Body() body: { email: string }) {
+    return this.authService.resendVerificationEmail(body.email);
+  }
 }

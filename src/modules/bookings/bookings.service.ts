@@ -16,7 +16,10 @@ import {
   PaginationParams,
 } from 'src/decorator/pagination.decorator';
 import { BookingPaginationtype } from 'src/modules/bookings/dto/bookings.dto';
-import { CreateVaccinationBookingDto } from 'src/modules/bookings/dto/create-booking.dto';
+import {
+  CreateBookingByAdminDto,
+  CreateVaccinationBookingDto,
+} from 'src/modules/bookings/dto/create-booking.dto';
 import { PrismaService } from 'src/prisma.service';
 import { mailService } from '../../lib/mail.service';
 import { USER_FIELDS, VACCINE_FIELDS } from 'src/configs/const';
@@ -236,7 +239,7 @@ export class BookingsService {
 
     const templateParams: BookingConfirmationTemplateParams = {
       userName: booking.user.name,
-      bookingId: booking.id,
+      bookingId: booking.Vaccination.batchNumber,
       productName,
       vaccinationQuantity: booking.vaccinationQuantity,
       createdAt: formattedCreatedAt,
@@ -267,5 +270,53 @@ export class BookingsService {
     return this.prismaService.booking.delete({
       where: { id: bookingId },
     });
+  }
+
+  // create booking by admin
+  async createBookingByAdmin(data: CreateBookingByAdminDto) {
+    const {
+      vaccinationId,
+      vaccinationQuantity,
+      appointmentDate,
+      userId: userAdmin,
+    } = data;
+
+    const vaccination = await this.prismaService.vaccination.findFirst({
+      where: { id: vaccinationId },
+    });
+
+    const booking = await this.prismaService.booking.create({
+      data: {
+        userId: userAdmin,
+        status: BookingStatus.WAITING_PAYMENT,
+        vaccinationPrice: vaccination.price,
+        vaccinationDate: vaccination.createdAt,
+        vaccinationQuantity,
+        appointmentDate,
+        vaccinationId,
+        confirmationTime: new Date(Date.now() + 3 * 60 * 1000),
+      },
+    });
+
+    await this.prismaService.appointment.create({
+      data: {
+        userId: userAdmin,
+        appointmentDate,
+        status: AppointmentStatus.PENDING,
+        vaccinationId,
+      },
+    });
+
+    await this.prismaService.payment.create({
+      data: {
+        userId: userAdmin,
+        bookingId: booking.id,
+        paymentMethod: PaymentMethod.CASH,
+        status: PaymentStatus.PENDING,
+        amount: vaccination.price * vaccinationQuantity,
+      },
+    });
+
+    return booking;
   }
 }

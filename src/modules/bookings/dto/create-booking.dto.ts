@@ -14,3 +14,9 @@ export class CreateVaccinationBookingDto {
   @IsString()
   appointmentDate?: string;
 }
+
+export class CreateBookingByAdminDto extends CreateVaccinationBookingDto {
+  @ApiProperty()
+  @IsString()
+  userId: string;
+}

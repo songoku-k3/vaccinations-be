@@ -21,7 +21,10 @@ import {
   BookingPaginationtype,
   ConfirmBookingDto,
 } from 'src/modules/bookings/dto/bookings.dto';
-import { CreateVaccinationBookingDto } from 'src/modules/bookings/dto/create-booking.dto';
+import {
+  CreateBookingByAdminDto,
+  CreateVaccinationBookingDto,
+} from 'src/modules/bookings/dto/create-booking.dto';
 import { Roles } from 'src/decorator/roles.decorator';
 import { RolesGuard } from 'src/guard/roles.guard';
 
@@ -71,5 +74,13 @@ export class BookingsController {
   @Delete(':id')
   async deleteBooking(@Param('id') id: string) {
     return this.bookingsService.deleteBooking(id);
+  }
+
+  @UseGuards(HandleAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiCommonResponses('Tạo booking')
+  @Post('admin')
+  async createBookingByAdmin(@Body() body: CreateBookingByAdminDto) {
+    return this.bookingsService.createBookingByAdmin(body);
   }
 }

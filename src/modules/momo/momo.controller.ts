@@ -97,11 +97,11 @@ export class MomoController {
   @ApiCommonResponses('Xử lý IPN từ Momo')
   @HttpCode(HttpStatus.OK)
   async handleMomoIpn(@Body() ipnData: MomoIpnDto) {
-    console.log('ipnData:', ipnData);
     return this.momoService.handleIpn(ipnData);
   }
 
-  @UseGuards(HandleAuthGuard)
+  @UseGuards(HandleAuthGuard, RolesGuard)
+  @Roles('ADMIN', 'EMPLOYEE')
   @ApiCommonResponses('Cập nhật trạng thái thanh toán')
   @Put('payment/:id')
   async changeStatusPayment(
