@@ -3,7 +3,6 @@ import {
   AppointmentStatus,
   BookingStatus,
   PaymentMethod,
-  PaymentStatus,
 } from '@prisma/client';
 import axios from 'axios';
 import * as crypto from 'crypto';
@@ -11,6 +10,7 @@ import {
   Pagination,
   PaginationParams,
 } from 'src/decorator/pagination.decorator';
+import { PaymentStatus } from 'src/enums/payment.enum';
 import {
   MomoDto,
   MomoIpnDto,
@@ -357,5 +357,33 @@ export class MomoService {
       where: { status: PaymentStatus.COMPLETED },
     });
     return { data: { total } };
+  }
+  async changeStatusPayment(paymentId: string, status: PaymentStatus) {
+    const payment = await this.prismaService.payment.findUnique({
+      where: { id: paymentId },
+      include: { booking: true },
+    });
+
+    if (!payment) {
+      throw new HttpException('Payment not found', HttpStatus.NOT_FOUND);
+    }
+
+    await this.prismaService.$transaction([
+      this.prismaService.payment.update({
+        where: { id: paymentId },
+        data: { status },
+      }),
+      this.prismaService.booking.update({
+        where: { id: payment.booking.id },
+        data: {
+          status:
+            status === PaymentStatus.COMPLETED
+              ? BookingStatus.CONFIRMED
+              : BookingStatus.WAITING_PAYMENT,
+        },
+      }),
+    ]);
+
+    return { message: 'Updated payment and booking status successfully' };
   }
 }

@@ -1,6 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Payment } from '@prisma/client';
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
+import { PaymentStatus } from 'src/enums/payment.enum';
 import { PaginationResponse } from 'src/types/PaginationResponse';
 
 export class MomoDto {
@@ -133,3 +140,12 @@ export class MomoDtoType {
 }
 
 export type PaymentPaginationResponse = PaginationResponse<Payment>;
+
+export class ChangeStatusPaymentDto {
+  @ApiProperty({
+    description: 'The status of the payment',
+    example: 'COMPLETED',
+  })
+  @IsEnum(PaymentStatus)
+  status: PaymentStatus;
+}

@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Put,
   Query,
   Req,
   UseGuards,
@@ -20,6 +21,7 @@ import {
 } from 'src/decorator/pagination.decorator';
 import { HandleAuthGuard } from 'src/modules/auth/guard/auth.guard';
 import {
+  ChangeStatusPaymentDto,
   MomoDto,
   MomoIpnDto,
   PaymentPaginationResponse,
@@ -94,5 +96,15 @@ export class MomoController {
   async handleMomoIpn(@Body() ipnData: MomoIpnDto) {
     console.log('ipnData:', ipnData);
     return this.momoService.handleIpn(ipnData);
+  }
+
+  @UseGuards(HandleAuthGuard)
+  @ApiCommonResponses('Cập nhật trạng thái thanh toán')
+  @Put('payment/:id')
+  async changeStatusPayment(
+    @Param('id') id: string,
+    @Body() status: ChangeStatusPaymentDto,
+  ) {
+    return this.momoService.changeStatusPayment(id, status.status);
   }
 }
