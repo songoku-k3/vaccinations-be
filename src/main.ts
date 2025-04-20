@@ -3,10 +3,13 @@ import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.setGlobalPrefix('api');
+
+  app.useStaticAssets(join(__dirname, '..', 'public'));
 
   // config swagger api
   const config = new DocumentBuilder()
@@ -42,6 +45,11 @@ async function bootstrap() {
   };
 
   app.enableCors(corsOptions);
+
+  if (!process.env.BASE_URL) {
+    process.env.BASE_URL = 'http://localhost:4000';
+  }
+
   await app.listen(3001);
 }
 

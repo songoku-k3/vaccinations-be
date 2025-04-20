@@ -1,8 +1,9 @@
 import {
-  ForbiddenException,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
+  ForbiddenException,
+  InternalServerErrorException,
+  BadRequestException,
 } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import {
@@ -17,20 +18,29 @@ import {
 } from 'src/decorator/pagination.decorator';
 import { BookingPaginationtype } from 'src/modules/bookings/dto/bookings.dto';
 import {
-  CreateBookingByAdminDto,
   CreateVaccinationBookingDto,
+  CreateBookingByAdminDto,
 } from 'src/modules/bookings/dto/create-booking.dto';
 import { PrismaService } from 'src/prisma.service';
 import { mailService } from '../../lib/mail.service';
 import { USER_FIELDS, VACCINE_FIELDS } from 'src/configs/const';
+import * as QRCode from 'qrcode';
+import * as path from 'path';
+import * as fs from 'fs';
 import {
   BookingConfirmationTemplateParams,
   getBookingConfirmationTemplate,
-} from 'src/modules/vaccinations/booking-confirmation-template';
+} from 'src/templates/booking-confirmation-template';
 
 @Injectable()
 export class BookingsService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) {
+    // Đảm bảo thư mục QR code tồn tại
+    const qrCodeDir = path.join(process.cwd(), 'public', 'qrcodes');
+    if (!fs.existsSync(qrCodeDir)) {
+      fs.mkdirSync(qrCodeDir, { recursive: true });
+    }
+  }
 
   @Cron('0 * * * *')
   async deleteExpiredBookings() {
@@ -39,9 +49,7 @@ export class BookingsService {
 
     const deletedBookings = await this.prismaService.booking.deleteMany({
       where: {
-        createdAt: {
-          lt: twentyFourHoursAgo,
-        },
+        createdAt: { lt: twentyFourHoursAgo },
         status: 'PENDING',
       },
     });
@@ -55,21 +63,11 @@ export class BookingsService {
     const { itemsPerPage, skip, search, page } = pagination;
 
     const bookings = await this.prismaService.booking.findMany({
-      where: {
-        vaccinationId: {
-          contains: search,
-        },
-      },
+      where: { vaccinationId: { contains: search } },
       include: {
-        user: {
-          select: USER_FIELDS,
-        },
+        user: { select: USER_FIELDS },
         Vaccination: {
-          select: {
-            ...VACCINE_FIELDS,
-            supplier: true,
-            manufacturer: true,
-          },
+          select: { ...VACCINE_FIELDS, supplier: true, manufacturer: true },
         },
       },
       skip,
@@ -77,35 +75,19 @@ export class BookingsService {
     });
 
     const total = await this.prismaService.booking.count({
-      where: {
-        vaccinationId: {
-          contains: search,
-        },
-      },
+      where: { vaccinationId: { contains: search } },
     });
-    return {
-      data: bookings,
-      total,
-      currentPage: page,
-      itemsPerPage: itemsPerPage,
-    };
+
+    return { data: bookings, total, currentPage: page, itemsPerPage };
   }
 
   async getById(id: string) {
     return this.prismaService.booking.findFirst({
-      where: {
-        id,
-      },
+      where: { id },
       select: {
-        user: {
-          select: USER_FIELDS,
-        },
+        user: { select: USER_FIELDS },
         Vaccination: {
-          select: {
-            ...VACCINE_FIELDS,
-            supplier: true,
-            manufacturer: true,
-          },
+          select: { ...VACCINE_FIELDS, supplier: true, manufacturer: true },
         },
       },
     });
@@ -119,11 +101,11 @@ export class BookingsService {
     });
 
     if (!vaccination) {
-      throw new Error('Vaccination not found');
+      throw new NotFoundException('Không tìm thấy vaccine');
     }
 
     if (vaccination.remainingQuantity < vaccinationQuantity) {
-      throw new Error('Not enough vaccination doses available');
+      throw new BadRequestException('Không đủ liều vaccine');
     }
 
     const totalAmount = vaccination.price * vaccinationQuantity;
@@ -146,7 +128,7 @@ export class BookingsService {
           status: 'PENDING',
           vaccinationPrice: vaccination.price,
           appointmentDate,
-          vaccinationDate: vaccination.createdAt,
+          vaccinationDate: new Date(appointmentDate),
           confirmationTime: new Date(Date.now() + 3 * 60 * 1000),
         },
       });
@@ -168,15 +150,9 @@ export class BookingsService {
     const booking = await this.prismaService.booking.findUnique({
       where: { id: bookingId },
       include: {
-        user: {
-          select: USER_FIELDS,
-        },
+        user: { select: USER_FIELDS },
         Vaccination: {
-          select: {
-            ...VACCINE_FIELDS,
-            supplier: true,
-            manufacturer: true,
-          },
+          select: { ...VACCINE_FIELDS, supplier: true, manufacturer: true },
         },
       },
     });
@@ -189,12 +165,14 @@ export class BookingsService {
       throw new ForbiddenException('Không có quyền truy cập đặt chỗ này');
     }
 
+    if (booking.status !== BookingStatus.PENDING) {
+      throw new BadRequestException('Đặt chỗ không ở trạng thái PENDING');
+    }
+
     await this.prismaService.$transaction(async (prisma) => {
       const updatedBooking = await prisma.booking.update({
         where: { id: bookingId },
-        data: {
-          status: BookingStatus.WAITING_PAYMENT,
-        },
+        data: { status: BookingStatus.WAITING_PAYMENT },
         include: {
           user: { select: USER_FIELDS },
           Vaccination: {
@@ -219,15 +197,54 @@ export class BookingsService {
         data: { status: AppointmentStatus.CONFIRMED },
       });
 
+      const qrCodeData = JSON.stringify({
+        bookingId: booking.id,
+        totalAmount: booking.totalAmount,
+        paymentMethod: 'CASH',
+        userId,
+      });
+
+      const qrCodeFileName = `booking-qr-${booking.id}.png`;
+      const qrCodeFilePath = path.join(
+        process.cwd(),
+        'public',
+        'qrcodes',
+        qrCodeFileName,
+      );
+
+      await QRCode.toFile(qrCodeFilePath, qrCodeData, {
+        errorCorrectionLevel: 'H',
+        margin: 1,
+        width: 300,
+        color: {
+          dark: '#000000',
+          light: '#ffffff',
+        },
+      });
+
       return updatedBooking;
     });
 
+    const qrCodeData = JSON.stringify({
+      bookingId: booking.id,
+      totalAmount: booking.totalAmount,
+      paymentMethod: 'CASH',
+      userId,
+    });
+
+    const qrCodeDataUrl = await QRCode.toDataURL(qrCodeData, {
+      errorCorrectionLevel: 'H',
+      margin: 1,
+      width: 300,
+      color: {
+        dark: '#000000',
+        light: '#ffffff',
+      },
+    });
     const formattedTotalAmount = new Intl.NumberFormat('vi-VN', {
       style: 'currency',
       currency: 'VND',
     }).format(booking.totalAmount);
-
-    const productName = booking.Vaccination?.vaccineName || '';
 
     const formattedCreatedAt = new Date(booking.createdAt).toLocaleString(
       'vi-VN',
@@ -237,6 +254,8 @@ export class BookingsService {
       },
     );
 
+    const productName = booking.Vaccination?.vaccineName || '';
+
     const templateParams: BookingConfirmationTemplateParams = {
       userName: booking.user.name,
       bookingId: booking.Vaccination.batchNumber,
@@ -245,6 +264,7 @@ export class BookingsService {
       createdAt: formattedCreatedAt,
       totalAmount: formattedTotalAmount,
       paymentMethod: 'Tiền mặt (CASH)',
+      qrCode: qrCodeDataUrl,
     };
 
     const emailHtml = getBookingConfirmationTemplate(templateParams);
@@ -255,14 +275,14 @@ export class BookingsService {
         subject: 'Xác nhận đặt vaccine thành công!',
         html: emailHtml,
       });
-    } catch (error) {
-      console.error('Gửi email xác nhận thất bại:', error);
+    } catch (emailError) {
+      console.error('Gửi email xác nhận thất bại:', emailError);
       throw new InternalServerErrorException('Không thể gửi email xác nhận');
     }
 
     return {
       message:
-        'Đặt chỗ đã được xác nhận, phương thức thanh toán là CASH, và email đã được gửi thành công',
+        'Đặt chỗ đã được xác nhận, mã QR thanh toán đã được tạo, phương thức thanh toán là CASH, và email đã được gửi thành công',
     };
   }
 
@@ -272,7 +292,6 @@ export class BookingsService {
     });
   }
 
-  // create booking by admin
   async createBookingByAdmin(data: CreateBookingByAdminDto) {
     const {
       vaccinationId,
@@ -285,36 +304,47 @@ export class BookingsService {
       where: { id: vaccinationId },
     });
 
-    const booking = await this.prismaService.booking.create({
-      data: {
-        userId: userAdmin,
-        status: BookingStatus.WAITING_PAYMENT,
-        vaccinationPrice: vaccination.price,
-        vaccinationDate: vaccination.createdAt,
-        vaccinationQuantity,
-        appointmentDate,
-        vaccinationId,
-        confirmationTime: new Date(Date.now() + 3 * 60 * 1000),
-      },
-    });
+    if (!vaccination) {
+      throw new NotFoundException('Không tìm thấy vaccine');
+    }
 
-    await this.prismaService.appointment.create({
-      data: {
-        userId: userAdmin,
-        appointmentDate,
-        status: AppointmentStatus.PENDING,
-        vaccinationId,
-      },
-    });
+    const totalAmount = vaccination.price * vaccinationQuantity;
 
-    await this.prismaService.payment.create({
-      data: {
-        userId: userAdmin,
-        bookingId: booking.id,
-        paymentMethod: PaymentMethod.CASH,
-        status: PaymentStatus.PENDING,
-        amount: vaccination.price * vaccinationQuantity,
-      },
+    const booking = await this.prismaService.$transaction(async (prisma) => {
+      const booking = await prisma.booking.create({
+        data: {
+          userId: userAdmin,
+          status: BookingStatus.WAITING_PAYMENT,
+          vaccinationPrice: vaccination.price,
+          vaccinationDate: new Date(appointmentDate),
+          vaccinationQuantity,
+          appointmentDate,
+          vaccinationId,
+          totalAmount,
+          confirmationTime: new Date(Date.now() + 3 * 60 * 1000),
+        },
+      });
+
+      await prisma.appointment.create({
+        data: {
+          userId: userAdmin,
+          appointmentDate,
+          status: AppointmentStatus.PENDING,
+          vaccinationId,
+        },
+      });
+
+      await prisma.payment.create({
+        data: {
+          userId: userAdmin,
+          bookingId: booking.id,
+          paymentMethod: PaymentMethod.CASH,
+          status: PaymentStatus.PENDING,
+          amount: totalAmount,
+        },
+      });
+
+      return booking;
     });
 
     return booking;
