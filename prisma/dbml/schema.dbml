@@ -256,7 +256,7 @@ Ref: vaccinations.supplierId > suppliers.id
 
 Ref: vaccinations.categoryVaccinationId > category_vaccinations.id
 
-Ref: vaccination_records.userId > users.id
+Ref: vaccination_records.userId > users.id [delete: Cascade]
 
 Ref: vaccination_records.vaccinationId > vaccinations.id
 
@@ -270,11 +270,11 @@ Ref: inventory.vaccinationId > vaccinations.id
 
 Ref: bookings.vaccinationId > vaccinations.id
 
-Ref: bookings.userId > users.id
+Ref: bookings.userId > users.id [delete: Cascade]
 
 Ref: payments.bookingId > bookings.id [delete: Set Null]
 
-Ref: payments.userId > users.id
+Ref: payments.userId > users.id [delete: Cascade]
 
 Ref: users_on_vaccinations.userId > users.id
 
