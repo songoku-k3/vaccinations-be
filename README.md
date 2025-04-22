@@ -1,81 +1,172 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Vaccination Management System Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A comprehensive backend system for managing vaccinations, built with modern technologies and best practices.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
+## Project Overview
+
+This project is a RESTful API backend service for managing vaccination records, appointments, and related healthcare services. It provides features such as:
+
+- 💉 Vaccination management and tracking
+- 👥 User authentication and authorization
+- 📅 Appointment scheduling
+- 💳 Payment integration with MOMO
+- 📧 Email notifications
+- 🗄️ File storage with AWS S3
+- 📱 QR code generation for vaccination records
 
 ## Tech Stack
 
-  <div align="center">
-    <img src="https://img.shields.io/badge/nestjs-E0234E?style=for-the-badge&logo=nestjs&logoColor=white" alt="nestjs" />
-    <img src="https://img.shields.io/badge/-TypeScript-black?style=for-the-badge&logoColor=white&logo=typescript&color=3178C6" alt="typescript" />
-    <img src="https://img.shields.io/badge/postgresql-4169e1?style=for-the-badge&logo=postgresql&logoColor=white" alt="postgresql" />
-    <img src="https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white" alt="prisma" />
-  </div>
+<div align="center">
+  <img src="https://img.shields.io/badge/nestjs-E0234E?style=for-the-badge&logo=nestjs&logoColor=white" alt="nestjs" />
+  <img src="https://img.shields.io/badge/-TypeScript-black?style=for-the-badge&logoColor=white&logo=typescript&color=3178C6" alt="typescript" />
+  <img src="https://img.shields.io/badge/postgresql-4169e1?style=for-the-badge&logo=postgresql&logoColor=white" alt="postgresql" />
+  <img src="https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white" alt="prisma" />
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="docker" />
+</div>
 
-## Installation
+## Prerequisites
+
+Before you begin, ensure you have the following installed:
+
+- Docker and Docker Compose
+- Node.js (v18 or higher) - for local development
+- npm (Node Package Manager)
+
+## Getting Started
+
+### Running with Docker (Recommended)
+
+1. Clone the repository:
 
 ```bash
-$ npm install
+git clone <repository-url>
+cd vaccinations-be
 ```
 
-## Set Up Environment Variables
+2. Set up environment variables:
 
-Create a new file named `.env` in the root of your project and add the following content:
+```bash
+# Copy the example env file
+cp .env.example .env
+
+# Edit the .env file with your configuration
+nano .env
+```
+
+3. Build and run the Docker container:
+
+```bash
+# Build the container
+docker-compose build
+
+# Run the container
+docker-compose up -d
+```
+
+The API will be available at http://localhost:3001/api
+
+To view logs:
+
+```bash
+docker-compose logs -f
+```
+
+To stop the container:
+
+```bash
+docker-compose down
+```
+
+### Local Development Setup
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Set up environment variables (same as Docker setup)
+
+3. Run the development server:
+
+```bash
+# Development mode with hot-reload
+npm run start:dev
+
+# Production mode
+npm run start:prod
+```
+
+## Environment Variables
+
+Create a `.env` file with the following variables:
 
 ```env
-DATABASE_URL=
-ACCESS_TOKEN_KEY=
-REFRESH_TOKEN_KEY=
-MAIL_TRANSPORT=
-MAIL_FROM=
-JWT_SECRET=
-AWS_REGION=
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
-AWS_S3_BUCKET_NAME=
+PORT=3001
+DATABASE_URL=          # PostgreSQL connection URL
+ACCESS_TOKEN_KEY=      # JWT access token secret
+REFRESH_TOKEN_KEY=     # JWT refresh token secret
+MAIL_TRANSPORT=        # SMTP transport URL
+MAIL_FROM=            # Sender email address
+JWT_SECRET=           # JWT secret key
+AWS_REGION=           # AWS region for S3
+AWS_ACCESS_KEY_ID=    # AWS access key
+AWS_SECRET_ACCESS_KEY= # AWS secret key
+AWS_S3_BUCKET_NAME=   # S3 bucket name
+MOMO_YOUR_SECRET_KEY= # MOMO payment secret key
+MOMO_PARTNER_CODE=    # MOMO partner code
+MOMO_ACCESS_KEY=      # MOMO access key
+MOMO_REDIRECT_URL=    # Payment redirect URL
+MOMO_IPN_URL=        # Payment IPN URL
 ```
 
-## Running the app
+## API Documentation
+
+The API documentation is available through Swagger UI at:
+
+- Local: http://localhost:3001/api
+- Development: [Your-Dev-URL]/api
+- Production: [Your-Production-URL]/api
+
+## Testing
 
 ```bash
-# watch mode
-$ npm run start:dev
+# Unit tests
+npm run test
 
-# production mode
-$ npm run start:prod
+# E2E tests
+npm run test:e2e
+
+# Test coverage
+npm run test:cov
 ```
 
-## Test
+## Project Structure
 
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+```
+src/
+├── auth/           # Authentication & authorization
+├── common/         # Shared utilities, guards, decorators
+├── config/         # Configuration modules
+├── modules/        # Feature modules
+│   ├── users/
+│   ├── vaccinations/
+│   ├── appointments/
+│   └── payments/
+├── prisma/        # Database schema and migrations
+└── main.ts        # Application entry point
 ```
 
-Open http://localhost:3001/api with your favorite browser to swagger.
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a new Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ---
-

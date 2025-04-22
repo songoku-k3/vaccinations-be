@@ -2,27 +2,13 @@ version: '3.8'
 
 services:
   app:
-    container_name: vaccine-api-dev
     build:
       context: .
-      target: development
+      dockerfile: Dockerfile
+    ports:
+      - '${PORT}:${PORT}'
+    env_file:
+      - .env
     volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
-    ports:
-      - '3002:3001'
-    environment:
-      - NODE_ENV=development
-      - PORT=3001
-    command: npm run dev
-
-  app-prod:
-    container_name: vaccine-api-prod
-    build:
-      context: .
-      target: production
-    ports:
-      - '3002:3001'
-    environment:
-      - NODE_ENV=production
-      - PORT=3001
+      - ./public:/app/public
+    restart: unless-stopped

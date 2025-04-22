@@ -50,7 +50,7 @@ async function bootstrap() {
     process.env.BASE_URL = 'http://localhost:4000';
   }
 
-  await app.listen(3001);
+  await app.listen(process.env.PORT || 3001);
 }
 
 bootstrap();
