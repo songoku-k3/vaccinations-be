@@ -56,7 +56,7 @@ Table blogs {
 Table vaccinations {
   id String [pk]
   userId String
-  vaccineName String [not null]
+  vaccineName String [unique, not null]
   image String
   location String
   description String

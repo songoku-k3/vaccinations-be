@@ -1,5 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { Vaccination } from '@prisma/client';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
+import { Vaccination, Prisma } from '@prisma/client';
 import { numberConstants } from 'src/configs/consts';
 import {
   Pagination,
@@ -107,6 +111,11 @@ export class VaccinationsService {
         },
       });
     } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          throw new ConflictException('Vaccine name already exists');
+        }
+      }
       throw new Error(`Failed to create vaccination: ${error.message}`);
     }
   }
@@ -136,6 +145,11 @@ export class VaccinationsService {
         },
       });
     } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          throw new ConflictException('Vaccine name already exists');
+        }
+      }
       if (error instanceof NotFoundException) throw error;
       throw new Error(`Failed to update vaccination: ${error.message}`);
     }

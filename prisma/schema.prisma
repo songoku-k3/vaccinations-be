@@ -81,7 +81,7 @@ enum TagType {
 model Vaccination {
   id                    String        @id @default(uuid())
   userId                String?
-  vaccineName           String
+  vaccineName           String        @unique
   image                 String?
   location              String?
   description           String?
@@ -154,7 +154,7 @@ model VaccinationRecord {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime? @updatedAt
 
-  user        User        @relation(fields: [userId], references: [id],onDelete: Cascade )
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   vaccination Vaccination @relation(fields: [vaccinationId], references: [id])
 
   @@map("vaccination_records")
@@ -254,7 +254,7 @@ model Payment {
   updatedAt       DateTime?     @updatedAt
 
   booking Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
-  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade )
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("payments")
 }
