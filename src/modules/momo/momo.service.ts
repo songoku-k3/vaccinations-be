@@ -322,12 +322,19 @@ export class MomoService {
           booking: {
             select: {
               id: true,
-              Vaccination: true,
+              appointmentDate: true,
+              vaccinationQuantity: true,
+              Vaccination: {
+                select: {
+                  vaccineName: true,
+                },
+              },
               totalAmount: true,
               createdAt: true,
             },
           },
         },
+
         orderBy: { createdAt: 'desc' },
       }),
       this.prismaService.payment.count({
@@ -342,11 +349,14 @@ export class MomoService {
       .filter((payment) => payment.booking)
       .map((payment) => ({
         paymentId: payment.id,
+        appointmentDate: payment.booking.appointmentDate,
+        vaccinationQuantity: payment.booking.vaccinationQuantity,
         bookingId: payment.booking.id,
         totalAmount: payment.booking.totalAmount,
         createdAt: payment.booking.createdAt,
         status: payment.status,
         paymentMethod: payment.paymentMethod,
+        vaccination: payment.booking.Vaccination,
       }));
 
     return { data: responseData, total };
