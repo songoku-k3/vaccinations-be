@@ -79,17 +79,12 @@ export class AppointmentsService {
     });
   }
 
-  async UpdateAppointment(
-    id: string,
-    data: UpdateAppointmentDto,
-    userId: string,
-  ) {
+  async UpdateAppointment(id: string, data: UpdateAppointmentDto) {
     return this.prismaService.$transaction(async (prisma) => {
       const updatedAppointment = await prisma.appointment.update({
         where: { id },
         data: {
           ...data,
-          userId,
         },
         include: {
           vaccination: true,

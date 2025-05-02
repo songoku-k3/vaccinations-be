@@ -12,7 +12,6 @@ import { ApiQuery } from '@nestjs/swagger';
 import { ApiCommonResponses } from 'src/decorator/api-common-responses.decorator';
 import { CommonPagination } from 'src/decorator/common-pagination.decorator';
 import { ApiTagController } from 'src/decorator/common.decorator';
-import { CurrentUserId } from 'src/decorator/current-user-id.decorator';
 import {
   Pagination,
   PaginationParams,
@@ -64,13 +63,8 @@ export class AppointmentsController {
   async updateAppointment(
     @Param('id') id: string,
     @Body() updateAppointmentDto: UpdateAppointmentDto,
-    @CurrentUserId() userId: string,
   ) {
-    return this.appointmentsService.UpdateAppointment(
-      id,
-      updateAppointmentDto,
-      userId,
-    );
+    return this.appointmentsService.UpdateAppointment(id, updateAppointmentDto);
   }
 
   @UseGuards(HandleAuthGuard)
