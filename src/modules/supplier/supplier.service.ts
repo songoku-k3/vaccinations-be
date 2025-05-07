@@ -22,6 +22,9 @@ export class SupplierService {
           contains: search,
         },
       },
+      orderBy: {
+        name: 'desc',
+      },
       skip,
       take: itemsPerPage,
     });

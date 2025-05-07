@@ -23,6 +23,9 @@ export class ManufacturersService {
           contains: search,
         },
       },
+      orderBy: {
+        name: 'desc',
+      },
       skip,
       take: itemsPerPage,
     });

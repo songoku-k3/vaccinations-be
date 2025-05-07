@@ -70,6 +70,9 @@ export class BookingsService {
           select: { ...VACCINE_FIELDS, supplier: true, manufacturer: true },
         },
       },
+      orderBy: {
+        createdAt: 'desc',
+      },
       skip,
       take: itemsPerPage,
     });

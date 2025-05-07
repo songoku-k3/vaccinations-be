@@ -13,7 +13,7 @@ import { getAppointmentReminderTemplate } from 'src/templates/appointment-remind
 export class NotificationsService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  @Cron(CronExpression.EVERY_DAY_AT_8AM)
+  @Cron(CronExpression.EVERY_DAY_AT_10PM)
   async sendAppointmentReminders() {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);

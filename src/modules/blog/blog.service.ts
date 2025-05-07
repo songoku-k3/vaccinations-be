@@ -31,6 +31,9 @@ export class BlogService {
         },
         tag: true,
       },
+      orderBy: {
+        createdAt: 'desc',
+      },
       skip,
       take: itemsPerPage,
     });

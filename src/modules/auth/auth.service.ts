@@ -394,7 +394,7 @@ export class AuthService {
     );
     if (!isCurrentPasswordCorrect) {
       throw new HttpException(
-        { message: 'Current password is incorrect' },
+        { message: 'Mật khẩu hiện tại không đúng' },
         HttpStatus.BAD_REQUEST,
       );
     }

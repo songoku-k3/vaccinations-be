@@ -38,6 +38,9 @@ export class AppointmentsService {
           select: USER_FIELDS,
         },
       },
+      orderBy: {
+        createdAt: 'desc',
+      },
       skip,
       take: itemsPerPage,
     });
@@ -160,7 +163,7 @@ export class AppointmentsService {
         },
       },
       orderBy: {
-        appointmentDate: 'asc',
+        appointmentDate: 'desc',
       },
     });
 

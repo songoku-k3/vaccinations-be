@@ -48,6 +48,9 @@ export class VaccinationsService {
         include: {
           CategoryVaccination: true,
         },
+        orderBy: {
+          createdAt: 'desc',
+        },
         skip,
         take: itemsPerPage,
       }),
