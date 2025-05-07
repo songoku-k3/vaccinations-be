@@ -11,10 +11,34 @@ import { getAppointmentReminderTemplate } from 'src/templates/appointment-remind
 
 @Injectable()
 export class NotificationsService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) {
+    // Log thông tin múi giờ khi service được khởi tạo
+    this.logTimezoneInfo();
+  }
 
   @Cron(CronExpression.EVERY_DAY_AT_10PM)
+  private logTimezoneInfo() {
+    const now = new Date();
+    console.log('===== TIMEZONE INFO =====');
+    console.log(`Current server time: ${now.toString()}`);
+    console.log(`UTC time: ${now.toUTCString()}`);
+    console.log(
+      `Timezone offset: UTC${now.getTimezoneOffset() > 0 ? '-' : '+'}${Math.abs(now.getTimezoneOffset()) / 60}`,
+    );
+    console.log('========================');
+  }
+
+  // Chạy vào 10 giờ tối theo giờ Việt Nam (UTC+7)
+  // Tương đương với @Cron('0 0 22 * * *') hoặc EVERY_DAY_AT_10PM nhưng có chỉ định cụ thể múi giờ
+  // Format: '0 0 22 * * *' (giây phút giờ ngày tháng thứ)
+  @Cron(CronExpression.EVERY_DAY_AT_10PM, {
+    timeZone: 'Asia/Ho_Chi_Minh',
+  })
   async sendAppointmentReminders() {
+    console.log(
+      `Sending appointment reminders at: ${new Date().toLocaleString('vi-VN')}`,
+    );
+
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(0, 0, 0, 0);
@@ -28,7 +52,9 @@ export class NotificationsService {
           gte: tomorrow,
           lte: endOfTomorrow,
         },
-        status: AppointmentStatus.COMPLETED,
+        status: {
+          in: [AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED],
+        },
       },
       include: {
         user: true,
