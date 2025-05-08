@@ -3,7 +3,7 @@ import {
   NotFoundException,
   ConflictException,
 } from '@nestjs/common';
-import { Vaccination, Prisma } from '@prisma/client';
+import { Vaccination } from '@prisma/client';
 import { numberConstants } from 'src/configs/consts';
 import {
   Pagination,
@@ -30,6 +30,25 @@ export class VaccinationsService {
       characters.charAt(Math.floor(Math.random() * characters.length)),
     ).join('');
     return `${prefix}${randomPart}`;
+  }
+
+  private async checkDuplicateVaccineName(
+    vaccineName: string,
+    excludeId?: string,
+  ): Promise<void> {
+    const existingVaccine = await this.prismaService.vaccination.findFirst({
+      where: {
+        vaccineName: {
+          equals: vaccineName,
+          mode: 'insensitive',
+        },
+        ...(excludeId && { id: { not: excludeId } }),
+      },
+    });
+
+    if (existingVaccine) {
+      throw new ConflictException(`Vaccine ${vaccineName} đã tồn tại`);
+    }
   }
 
   async getAll(
@@ -77,7 +96,7 @@ export class VaccinationsService {
       where: { id },
     });
     if (!vaccination) {
-      throw new NotFoundException(`Vaccination with ID ${id} not found`);
+      throw new NotFoundException(`Vaccination ${id} không tồn tại`);
     }
     return vaccination;
   }
@@ -88,6 +107,8 @@ export class VaccinationsService {
     imageFile?: Express.Multer.File,
   ): Promise<Vaccination> {
     try {
+      await this.checkDuplicateVaccineName(data.vaccineName);
+
       let imageUrl = data.image;
 
       if (imageFile) {
@@ -113,12 +134,8 @@ export class VaccinationsService {
         },
       });
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2002') {
-          throw new ConflictException('Vaccine name already exists');
-        }
-      }
-      throw new Error(`Failed to create vaccination: ${error.message}`);
+      if (error instanceof ConflictException) throw error;
+      throw new Error(`Tạo vaccine thất bại: ${error.message}`);
     }
   }
 
@@ -129,6 +146,7 @@ export class VaccinationsService {
   ): Promise<Vaccination> {
     try {
       await this.getById(id);
+      await this.checkDuplicateVaccineName(data.vaccineName, id);
 
       let imageUrl = data.image;
 
@@ -147,13 +165,12 @@ export class VaccinationsService {
         },
       });
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2002') {
-          throw new ConflictException('Vaccine name already exists');
-        }
-      }
-      if (error instanceof NotFoundException) throw error;
-      throw new Error(`Failed to update vaccination: ${error.message}`);
+      if (
+        error instanceof ConflictException ||
+        error instanceof NotFoundException
+      )
+        throw error;
+      throw new Error(`Cập nhật vaccine thất bại: ${error.message}`);
     }
   }
 
@@ -165,7 +182,7 @@ export class VaccinationsService {
       });
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      throw new Error(`Failed to delete vaccination: ${error.message}`);
+      throw new Error(`Xóa vaccine thất bại: ${error.message}`);
     }
   }
 }
