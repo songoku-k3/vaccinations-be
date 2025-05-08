@@ -211,14 +211,14 @@ export class AuthService {
 
     if (!user.isVerified) {
       throw new HttpException(
-        { message: 'Account is not verified' },
+        { message: 'Tài khoản chưa được xác thực' },
         HttpStatus.UNAUTHORIZED,
       );
     }
 
     if (!user.role) {
       throw new HttpException(
-        { message: 'User role not assigned' },
+        { message: 'Vai trò người dùng không được gán' },
         HttpStatus.FORBIDDEN,
       );
     }
@@ -268,7 +268,7 @@ export class AuthService {
   createToken = async (id: string): Promise<string> => {
     if (!process.env.ACCESS_TOKEN_KEY) {
       throw new Error(
-        'Access token secret key not found in environment variables.',
+        'Khóa bí mật token truy cập không được tìm thấy trong biến môi trường.',
       );
     }
 
@@ -287,7 +287,7 @@ export class AuthService {
     await this.sendResetPasswordEmail(data.email, access_token);
 
     return {
-      message: 'Password reset instructions have been sent to your email.',
+      message: 'Hướng dẫn đặt lại mật khẩu đã được gửi đến email của bạn.',
     };
   }
 
@@ -323,7 +323,7 @@ export class AuthService {
     await this.validateNewPassword(newPassword, userRecord.password);
     await this.updateUserPassword(user.id, newPassword);
 
-    return { message: 'Password reset successfully' };
+    return { message: 'Đặt lại mật khẩu thành công' };
   }
 
   private async getUserPassword(userId: string) {
@@ -334,7 +334,7 @@ export class AuthService {
 
     if (!user?.password) {
       throw new HttpException(
-        { message: 'User password is missing' },
+        { message: 'Mật khẩu người dùng bị thiếu' },
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -349,7 +349,7 @@ export class AuthService {
     const isSamePassword = await compare(newPassword, currentPassword);
     if (isSamePassword) {
       throw new HttpException(
-        { message: 'New password cannot be the same as the old password' },
+        { message: 'Mật khẩu mới không thể giống với mật khẩu cũ' },
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -381,7 +381,7 @@ export class AuthService {
     );
     await this.updateUserPassword(user.id, newPassword);
 
-    return { message: 'Password changed successfully' };
+    return { message: 'Mật khẩu đã được thay đổi thành công' };
   }
 
   private async validateCurrentPassword(
@@ -407,14 +407,14 @@ export class AuthService {
   ): Promise<void> {
     if (isEqual(currentPassword, newPassword)) {
       throw new HttpException(
-        { message: 'New password cannot be the same as the current password' },
+        { message: 'Mật khẩu mới không thể giống với mật khẩu hiện tại' },
         HttpStatus.BAD_REQUEST,
       );
     }
 
     if (!isEqual(newPassword, confirmPassword)) {
       throw new HttpException(
-        { message: 'New password and confirm password do not match' },
+        { message: 'Mật khẩu mới và mật khẩu xác nhận không khớp' },
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -494,7 +494,7 @@ export class AuthService {
   async logout(refreshToken: string): Promise<{ message: string }> {
     if (!refreshToken) {
       throw new HttpException(
-        { message: 'Refresh token is required' },
+        { message: 'Refresh token là bắt buộc' },
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -506,7 +506,7 @@ export class AuthService {
 
     await this.blacklistToken(refreshToken);
 
-    return { message: 'Logged out successfully' };
+    return { message: 'Đăng xuất thành công' };
   }
 
   private async blacklistToken(refreshToken: string): Promise<void> {
@@ -525,7 +525,7 @@ export class AuthService {
       });
     } catch (error) {
       throw new HttpException(
-        { message: 'Failed to blacklist token' },
+        { message: 'Không thể xóa token' },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
@@ -538,7 +538,7 @@ export class AuthService {
       });
 
       if (blacklisted) {
-        throw new UnauthorizedException('Token has been invalidated');
+        throw new UnauthorizedException('Token đã bị hủy bỏ');
       }
 
       const decoded = this.jwtService.verify(token, {
@@ -546,7 +546,7 @@ export class AuthService {
       });
       return decoded;
     } catch (error) {
-      throw new UnauthorizedException('Invalid refresh token');
+      throw new UnauthorizedException('Token không hợp lệ');
     }
   }
 
@@ -557,12 +557,12 @@ export class AuthService {
       refreshTokenDto.refresh_token,
     );
     if (!payload) {
-      throw new UnauthorizedException('Invalid refresh token');
+      throw new UnauthorizedException('Token không hợp lệ');
     }
 
     const user = await this.userService.getDetail(payload.id);
     if (!user) {
-      throw new UnauthorizedException('User not found');
+      throw new UnauthorizedException('Người dùng không tồn tại');
     }
 
     const access_token = this.jwtService.sign(

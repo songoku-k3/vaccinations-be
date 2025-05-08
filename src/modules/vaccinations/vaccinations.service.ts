@@ -103,7 +103,6 @@ export class VaccinationsService {
           userId,
           image: imageUrl,
           batchNumber: this.generateBatchNumber(),
-          remainingQuantity: numberConstants.ONE,
           user: {
             create: {
               user: {
