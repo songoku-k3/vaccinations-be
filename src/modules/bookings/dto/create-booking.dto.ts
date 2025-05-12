@@ -1,14 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateVaccinationBookingDto {
   @ApiProperty()
   @IsString()
   vaccinationId: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false, default: 1 })
+  @IsOptional()
+  @Type(() => Number)
   @IsNumber()
-  vaccinationQuantity?: number;
+  vaccinationQuantity: number = 1;
 
   @ApiProperty()
   @IsString()

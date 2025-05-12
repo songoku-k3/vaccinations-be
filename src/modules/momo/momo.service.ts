@@ -27,7 +27,7 @@ export class MomoService {
   private readonly ACCESS_KEY = 'F8BBA842ECF85';
   private readonly REDIRECT_URL = 'http://localhost:4000';
   private readonly IPN_URL =
-    '  https://c5eb-115-76-54-21.ngrok-free.app/api/momo/ipn';
+    'https://26e9-115-76-54-41.ngrok-free.app/api/momo/ipn';
 
   async createPayment(data: MomoDto, userId: string) {
     const booking = await this.prismaService.booking.findUnique({
@@ -316,7 +316,7 @@ export class MomoService {
       this.prismaService.payment.findMany({
         where: {
           userId,
-          status: PaymentStatus.COMPLETED,
+          //status: PaymentStatus.COMPLETED,
         },
         include: {
           booking: {
@@ -340,7 +340,7 @@ export class MomoService {
       this.prismaService.payment.count({
         where: {
           userId,
-          status: PaymentStatus.COMPLETED,
+          //status: PaymentStatus.COMPLETED,
         },
       }),
     ]);

@@ -50,7 +50,7 @@ export class UserController {
     return this.userService.getCountUser();
   }
 
-  @UseGuards(HandleAuthGuard)
+  //@UseGuards(HandleAuthGuard)
   @Get()
   @ApiCommonResponses('Lấy ra danh sách user')
   @CommonPagination()
