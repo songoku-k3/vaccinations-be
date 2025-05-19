@@ -86,7 +86,7 @@ export const getAppointmentReminderTemplate = (
                         minute: '2-digit',
                       },
                     )}</p>
-                    <p><strong>Địa điểm:</strong> ${location || 'Chưa xác định'}</p>
+                    <p><strong>Địa điểm:</strong> ${location || '120 Hoàng Minh Thảo, Hòa Khánh Nam, Liên Chiểu, Đà Nẵng'}</p>
                 </div>
 
                 <p>Vui lòng đến đúng giờ và mang theo giấy tờ tùy thân. Nếu bạn cần thay đổi lịch hẹn, hãy liên hệ với chúng tôi sớm nhất có thể.</p>
@@ -94,7 +94,7 @@ export const getAppointmentReminderTemplate = (
                 <a href="#" class="btn">Xem Chi Tiết Lịch Hẹn</a>
             </div>
             <div class="footer">
-                <p>Trân trọng,<br>Hệ thống Quản lý Tiêm chủng<br>Email: support@tiemchung.vn | Hotline: 1900 1234</p>
+                <p>Trân trọng,<br>Hệ thống Quản lý Tiêm chủng<br>Email: vaxbot@gmail.com | Hotline: 0909 090 909</p>
                 <p>Nếu bạn không đăng ký lịch hẹn này, vui lòng liên hệ chúng tôi ngay.</p>
             </div>
         </div>

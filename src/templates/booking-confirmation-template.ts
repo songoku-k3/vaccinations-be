@@ -64,7 +64,7 @@ export function getBookingConfirmationTemplate(
       <body>
         <div class="container">
          <div class="header" style="background: linear-gradient(135deg, #0062cc, #0097a7); padding: 30px; text-align: center;">
-  <img src="https://img.freepik.com/free-vector/pharmacy-logo-template_23-2148630940.jpg" alt="Vaccination Logo" style="max-width: 140px; height: auto; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+  <img src="/images/logo3.png" alt="Vaccination Logo" style="max-width: 140px; height: auto; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
   <h1 style="color: white; font-size: 24px; margin-top: 15px; font-weight: 500;">VACCINE CENTER</h1>
 </div>
           <div class="content">
@@ -111,8 +111,8 @@ export function getBookingConfirmationTemplate(
           </div>
           <div class="footer">
             <p>Đội ngũ Hỗ trợ Khách hàng</p>
-            <p><a href="https://t.vercel.app">t.vercel.app</a></p>
-            <p>Email: <a href="mailto:support@example.com">support@example.com</a> | Hotline: <a href="tel:123456789">123-456-789</a></p>
+            <p><a href="https://www.facebook.com/profile.php?id=61575699530090">vax-bot</a></p>
+            <p>Email: <a href="mailto:support@example.com">vaxbot@gmail.com</a> | Hotline: <a href="tel:123456789">0909 090 909</a></p>
           </div>
         </div>
       </body>
