@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Prisma, User } from '@prisma/client';
+import { hash } from 'crypto';
 import { isEqual } from 'lodash';
 import { FileUploadService } from 'src/lib/file-upload.service';
 import { UpdateUserDto, UserFilterType } from 'src/modules/user/dto/user.dto';
@@ -206,5 +207,36 @@ export class UserService {
     return this.prismaService.user.findMany({
       where: { role: { name: 'USER' } },
     });
+  }
+  async initAdminAccount() {
+    const accountCount = await this.prismaService.user.count();
+    if (accountCount > 0) {
+      console.log('Tài khoản đã tồn tại, không cần khởi tạo admin.');
+      return;
+    }
+
+    const hashedPassword = await hash(
+      process.env.ADMIN_PASSWORD,
+      'sha256',
+      'hex',
+    );
+    const owner = await this.prismaService.user.create({
+      data: {
+        email: process.env.ADMIN_EMAIL,
+        password: hashedPassword,
+        name: 'Admin',
+        role: {
+          connect: {
+            name: 'ADMIN',
+          },
+        },
+      },
+      include: {
+        role: true,
+      },
+    });
+    console.log(
+      `Khởi tạo tài khoản admin thành công: ${owner.email}|${owner.password}`,
+    );
   }
 }

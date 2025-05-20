@@ -27,7 +27,7 @@ export class MomoService {
   private readonly ACCESS_KEY = 'F8BBA842ECF85';
   private readonly REDIRECT_URL = 'http://localhost:4000';
   private readonly IPN_URL =
-    'https://ef6c-42-116-126-91.ngrok-free.app/api/momo/ipn';
+    'https://50ab-115-76-54-63.ngrok-free.app/api/momo/ipn';
 
   async createPayment(data: MomoDto, userId: string) {
     const booking = await this.prismaService.booking.findUnique({
@@ -176,11 +176,11 @@ export class MomoService {
         await this.prismaService.appointment.update({
           where: { id: appointment.id },
           data: {
-            status: AppointmentStatus.COMPLETED,
+            status: AppointmentStatus.CONFIRMED,
             updatedAt: new Date(),
           },
         });
-        console.log(`Appointment ${appointment.id} updated to COMPLETED`);
+        console.log(`Appointment ${appointment.id} updated to CONFIRMED`);
       } else {
         console.warn('No matching appointment found for booking:', bookingId);
       }

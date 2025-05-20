@@ -51,6 +51,11 @@ export class BookingsService {
       where: {
         createdAt: { lt: twentyFourHoursAgo },
         status: 'PENDING',
+        Payment: {
+          some: {
+            paymentMethod: 'CREDIT_CARD',
+          },
+        },
       },
     });
 

@@ -5,6 +5,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { join } from 'path';
 import { ValidationPipe } from '@nestjs/common';
+import { UserService } from 'src/modules/user/user.service';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -52,6 +53,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
+  await app.get(UserService).initAdminAccount();
 
   if (!process.env.BASE_URL) {
     process.env.BASE_URL = 'http://localhost:4000';
