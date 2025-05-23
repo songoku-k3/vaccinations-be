@@ -31,7 +31,7 @@ export class NotificationsService {
   // Chạy vào 10 giờ tối theo giờ Việt Nam (UTC+7)
   // Tương đương với @Cron('0 0 22 * * *') hoặc EVERY_DAY_AT_10PM nhưng có chỉ định cụ thể múi giờ
   // Format: '0 0 22 * * *' (giây phút giờ ngày tháng thứ)
-  @Cron(CronExpression.EVERY_DAY_AT_10PM, {
+  @Cron(CronExpression.EVERY_DAY_AT_6PM, {
     timeZone: 'Asia/Ho_Chi_Minh',
   })
   async sendAppointmentReminders() {

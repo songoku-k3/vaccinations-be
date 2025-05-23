@@ -122,6 +122,7 @@ export class AuthService {
         password: hashedPassword,
         confirmPassword: hashedPassword,
         name: userData.name,
+        phone: userData.phone,
         verificationCode: verificationData.code,
         verificationCodeExpiresAt: verificationData.expiresAt,
         isVerified: false,

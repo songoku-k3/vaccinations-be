@@ -264,7 +264,7 @@ Ref: appointments.userId > users.id [delete: Cascade]
 
 Ref: appointments.vaccinationId > vaccinations.id
 
-Ref: notifications.userId > users.id
+Ref: notifications.userId > users.id [delete: Cascade]
 
 Ref: inventory.vaccinationId > vaccinations.id
 

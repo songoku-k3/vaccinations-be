@@ -13,7 +13,7 @@ export class RegisterDto {
   name: string;
 
   @ApiProperty()
-  @IsOptional()
+  @IsNotEmpty()
   @Matches(/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/)
   phone: string;
 
